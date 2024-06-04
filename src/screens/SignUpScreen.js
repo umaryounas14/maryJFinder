@@ -12,15 +12,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
+import { signUpUser } from '../redux/slices/signup-slice';
+import { useDispatch ,useSelector } from 'react-redux';
 
 const {width} = Dimensions.get('window');
 
 const SignUpScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [active, setActive] = useState({
     email: false,
     password: false,
@@ -34,6 +36,26 @@ const SignUpScreen = ({navigation}) => {
   const toggleActive = name => {
     setActive({...active, [name]: !active[name]});
   };
+
+  const dispatch = useDispatch();
+
+const signUpNow = async () =>{
+  try{
+    setLoading(true)
+const payload ={
+  email: email,
+  password: password,
+  terms: true
+}
+
+const response = await dispatch(signUpUser(payload))
+console.log(response, "message")
+  } catch(error){
+    console.error('sigup error', error)
+    setLoading(false)
+
+  }
+};
 
   return (
     <ScrollView>
@@ -98,9 +120,7 @@ const SignUpScreen = ({navigation}) => {
                 shadowless
                 color="#20B340"
                 style={{height: 48}}
-                onPress={() =>
-                 navigation.navigate('Verification')
-                }>
+                onPress= {signUpNow}>
                 Create Account
               </Button>
               <Button

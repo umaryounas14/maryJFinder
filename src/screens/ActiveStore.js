@@ -2,24 +2,21 @@ import React, {useState} from 'react';
 import {
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingView,
-  Alert,
-  Platform,
-  Text,
   View,
-  Image,
-  ScrollView,
+  Text,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  Image
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Assuming you're using FontAwesome icons
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
 import DropdownInput from '../components/DropDown';
-
 const {width} = Dimensions.get('window');
 
-const AddBusiness = ({navigation}) => {
+const ActivateStore = ({navigation}) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [email, setEmail] = useState('');
@@ -42,19 +39,36 @@ const AddBusiness = ({navigation}) => {
     setSelectedItem(item);
     setDropdownOpen(false);
   };
-
   return (
-    <ScrollView>
+    <View style={styles.container1}>
+      <View style={styles.announcementBanner}>
+        <Text style={styles.announcementText}>Activate Your Store!</Text>
+      </View>
+      <TouchableOpacity style={[styles.iconContainer, {top: 53, right: 60}]}>
+        <Icon name="bell" size={24} color="black" />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.iconContainer,
+          {
+            top: 50,
+            right: 20,
+            backgroundColor: 'green',
+            borderRadius: 20,
+            width: 30, // Adjust size as needed
+            height: 30,
+            position: 'absolute',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+        ]}>
+        <Icon name="user" size={24} color="white" />
+      </TouchableOpacity>
+      <ScrollView>
       <Block flex middle>
         <KeyboardAvoidingView behavior="padding" enabled>
-          <View>
-            <Image
-              source={require('../assets/splash.png')}
-              style={styles.image}
-            />
-          </View>
 
-          <Block middle style={{paddingVertical: theme.SIZES.BASE * 2.625}}>
+          <Block middle style={{paddingVertical: theme.SIZES.BASE * 4}}>
             <Text
               style={{
                 fontSize: 30,
@@ -63,7 +77,7 @@ const AddBusiness = ({navigation}) => {
                 marginLeft: 15,
                 marginTop: -20,
               }}>
-              Add Your Business
+              Activate Store
             </Text>
             <Text
               center
@@ -265,7 +279,7 @@ const AddBusiness = ({navigation}) => {
                   shadowless
                   color="#20B340"
                   style={{height: 48}}
-                  onPress={() => navigation.navigate('ActivateStore')}>
+                  onPress={() => navigation.navigate('Dashboard')}>
                   Continue
                 </Button>
               </Block>
@@ -274,24 +288,32 @@ const AddBusiness = ({navigation}) => {
         </KeyboardAvoidingView>
       </Block>
     </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  signin: {
-    marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
+  container1: {
+    flex: 1,
+  },
+  announcementBanner: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center', // Center items vertically
+    justifyContent: 'center', // Center items horizontally
+  },
+  announcementText: {
+    fontSize: 18,
+    fontWeight: '300',
+    color: 'black',
+  },
+  iconContainer: {
+    position: 'absolute',
   },
 
-  image: {
-    marginTop: 10,
-    width: 200,
-    height: 200,
-    marginLeft: 100,
-    marginBottom: -80,
-    resizeMode: 'contain',
-  },
-
-  input: {
+   input: {
     width: width * 0.9,
     borderRadius: 0,
     borderBottomWidth: 1,
@@ -313,4 +335,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddBusiness;
+export default ActivateStore;

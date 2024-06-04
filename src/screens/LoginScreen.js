@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -10,31 +10,28 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
+import {loginUser} from '../redux/slices/login-slice';
+import {useDispatch, useSelector} from 'react-redux';
+import {client_id, client_secret} from '../constants/configs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const {width} = Dimensions.get('window');
 
 const Login = ({navigation}) => {
-  //     const defaultState = {
-  //        email: '',
-  //        password: '',
-  //        active: {
-  //         email: false,
-  //         password: false
-  //        }
-  //     };
+  const dispatch = useDispatch();
+  const authUser = useSelector((state) => state.login);
 
-  //     const [state, setState] = React.useReducer((state, newState) => ({
-  //     ...state,
-  //     ...newState
-  // }), defaultState);
 
+  console.log(authUser, "my state")
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [active, setActive] = useState({
     email: false,
     password: false,
@@ -48,6 +45,42 @@ const Login = ({navigation}) => {
   const toggleActive = name => {
     setActive({...active, [name]: !active[name]});
   };
+
+
+  const loginNow = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        grant_type: 'password',
+        client_id: client_id,
+        client_secret: client_secret,
+        username: email,
+        password: password,
+        scope: '',
+      };
+  
+      const response = await dispatch(loginUser(payload));
+    console.log('Login Response:', response); // Log the API response
+
+    if (response?.payload?.body?.access_token) {
+      await AsyncStorage.setItem('accessToken', response?.payload?.body?.access_token);
+      await AsyncStorage.setItem('userData', JSON.stringify(response?.payload?.body?.user));
+
+      console.log('Login Successful!');
+      navigation.navigate('Dashboard');
+    } else {
+      console.log('Login Failed: No access token provided.');
+      Alert.alert('Login failed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Login Error:', error);
+    Alert.alert('An error occurred while logging in. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+ 
 
   return (
     <ScrollView>
@@ -119,15 +152,15 @@ const Login = ({navigation}) => {
                 shadowless
                 color="#20B340"
                 style={{height: 48}}
-                onPress={() =>navigation.navigate('About')
-                }>
-                Login
+                onPress={loading ? null : loginNow} // Disable button while loading
+              >
+                {loading ? <ActivityIndicator color="white" /> : 'Login'}
               </Button>
               <Button
                 size="large"
                 color="transparent"
                 shadowless
-                onPress={() => navigation.navigate('Sign Up')}>
+                onPress={() => navigation.navigate('Main')}>
                 <Text
                   center
                   color={theme.COLORS.WHITE}
