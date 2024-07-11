@@ -12,10 +12,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
 import DropdownInput from '../components/DropDown';
+
 
 const {width} = Dimensions.get('window');
 
@@ -38,7 +38,7 @@ const AboutBusiness = ({navigation}) => {
     setActive({...active, [name]: !active[name]});
   };
 
-  const handleDropdownSelect = (item) => {
+  const handleDropdownSelect = item => {
     setSelectedItem(item);
     setDropdownOpen(false);
   };
@@ -46,8 +46,10 @@ const AboutBusiness = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-        <KeyboardAvoidingView behavior="padding" enabled>
-          <View>
+      {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrowleft" size={24} color="#000" />
+          </TouchableOpacity> */}
+          <View style={{height: 150}}>
             <Image
               source={require('../assets/splash.png')}
               style={styles.image}
@@ -151,31 +153,34 @@ const AboutBusiness = ({navigation}) => {
                 ]}
               />
               <View style={{marginLeft: 20}}>
-              <DropdownInput/>
+                <DropdownInput />
               </View>
-               <Text
+              <Text
                 center
                 color={theme.COLORS.WHITE}
                 size={theme.SIZES.FONT * 0.75}
-                style={{color: '#949494', textAlign: 'center', paddingHorizontal:30, marginTop: 10,}}>
-               By completing this form, you consent to Mary J. Finder processing your information in accordance with our Privacy Policy.
+                style={{
+                  color: '#949494',
+                  textAlign: 'center',
+                  paddingHorizontal: 30,
+                  marginTop: 10,
+                }}>
+                By completing this form, you consent to Mary J. Finder
+                processing your information in accordance with our Privacy
+                Policy.
               </Text>
               <Block center flex style={{marginTop: 20}}>
-
-              <Button
-                size="medium"
-                shadowless
-                color="#20B340"
-                style={{height: 48}}
-                onPress={() =>
-                 navigation.navigate('AddBusiness')
-                }>
-                Continue
-              </Button>
+                <Button
+                  size="medium"
+                  shadowless
+                  color="#20B340"
+                  style={{height: 48}}
+                  onPress={() => navigation.navigate('AddBusiness')}>
+                  Continue
+                </Button>
               </Block>
             </Block>
           </Block>
-        </KeyboardAvoidingView>
       </Block>
     </ScrollView>
   );
@@ -186,15 +191,21 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
   },
 
-  image: {
-    marginTop: 10,
-    width: 200,
-    height: 200,
-    marginLeft: 100,
-    marginBottom: -80,
-    resizeMode: 'contain',
+  backButton: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? HeaderHeight + 10 : 10, // Adjust for different platform header heights
+    left: 10,
+    zIndex: 1, // Ensure it's above other components
+    padding: 10,
   },
-
+  image: {
+    width: 300,
+    height: 250,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginTop: 10, 
+    marginLeft: 40,
+  },
   input: {
     width: width * 0.9,
     borderRadius: 0,

@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
 
@@ -38,8 +37,7 @@ const About = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-        <KeyboardAvoidingView behavior="padding" enabled>
-          <View>
+          <View style ={{height: 150}}>
             <Image
               source={require('../assets/splash.png')}
               style={styles.image}
@@ -51,7 +49,7 @@ const About = ({navigation}) => {
                 fontSize: 30,
                 color: '#000000',
                 fontWeight: '500',
-                marginLeft: 10
+                marginLeft: 10,
               }}>
               About You
             </Text>
@@ -97,10 +95,7 @@ const About = ({navigation}) => {
                 shadowless
                 color="#20B340"
                 style={{height: 48}}
-                onPress={() =>
-                    navigation.navigate('AboutBusiness')
-                   }
-                >
+                onPress={() => navigation.navigate('Dashboard')}>
                 Agree
               </Button>
 
@@ -108,14 +103,18 @@ const About = ({navigation}) => {
                 center
                 color={theme.COLORS.WHITE}
                 size={theme.SIZES.FONT * 0.75}
-                style={{color: '#313131', textAlign: 'center', paddingHorizontal:20, marginTop: 10}}>
+                style={{
+                  color: '#313131',
+                  textAlign: 'center',
+                  paddingHorizontal: 20,
+                  marginTop: 10,
+                }}>
                 By clicking “Agree”, you agree to our Terms and have read our
                 Privacy Policy. You are also claiming that you are at least 21
                 yrs old or a valid medical patient.
               </Text>
             </Block>
           </Block>
-        </KeyboardAvoidingView>
       </Block>
     </ScrollView>
   );
@@ -127,12 +126,12 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    marginTop: 10,
-    width: 200,
-    height: 200,
-    marginLeft: 100,
-    marginBottom: -80,
+    width: 300,
+    height: 250,
     resizeMode: 'contain',
+    alignSelf: 'center',
+    marginTop: 10, 
+    marginLeft: 40,
   },
 
   input: {
@@ -144,8 +143,6 @@ const styles = StyleSheet.create({
   inputActive: {
     borderBottomColor: 'white',
   },
- 
- 
 });
 
 export default About;

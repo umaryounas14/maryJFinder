@@ -18,11 +18,15 @@ import {HeaderHeight} from '../constants/utils';
 import {signUpUser} from '../redux/slices/signUpSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {client_id, client_secret} from '../constants/configs';
+import { businessSignUp } from '../redux/slices/BusinessSignUpSlice';
+const {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/AntDesign'; // Import AntDesign icons
 
-const {width} = Dimensions.get('window');
 
-const SignUpScreen = ({navigation}) => {
+
+const BusinessSignUp = ({navigation}) => {
+
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,7 +45,8 @@ const SignUpScreen = ({navigation}) => {
   };
 
   const dispatch = useDispatch();
-  const signUpNow = async () => {
+
+  const businessSignUpNow = async () => {
     try {
       setLoading(true);
       const payload = {
@@ -53,16 +58,15 @@ const SignUpScreen = ({navigation}) => {
         client_secret: client_secret,
         username: email,
         scope: '',
+        account_type: 'business'
       };
-      const response = await dispatch(signUpUser(payload));
-      console.log(response, 'message');
-
+      const response = await dispatch(businessSignUp(payload));
+      console.log(response?.payload?.body, 'message');
       if (response?.payload?.body?.message) {
-        navigation.navigate('OtpVerify', {email: email, password: password});
+        navigation.navigate('OtpVerify' , { email: email, password: password });
       }
       else if (response?.payload?.body?.access_token)
-        navigation.navigate('About');
-
+        navigation.navigate('AboutBusiness');
       setLoading(false);
     } catch (error) {
       console.error('Signup error:', error);
@@ -76,7 +80,7 @@ const SignUpScreen = ({navigation}) => {
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrowleft" size={24} color="#000" />
           </TouchableOpacity>
-          <View style = {{ height: 150}}>
+      <View style={{height: 150}}>
             <Image
               source={require('../assets/splash.png')}
               style={styles.image}
@@ -85,12 +89,12 @@ const SignUpScreen = ({navigation}) => {
           <Block middle style={{paddingVertical: theme.SIZES.BASE * 2.625}}>
             <Text
               style={{
-                fontSize: 30,
+                fontSize: 25,
                 color: '#000000',
                 fontWeight: '500',
-                marginLeft: 10,
+                marginLeft: 5,
               }}>
-              Create an Account
+              Create Business Account
             </Text>
           </Block>
           <Block flex>
@@ -135,7 +139,7 @@ const SignUpScreen = ({navigation}) => {
                 shadowless
                 color="#20B340"
                 style={{height: 48}}
-                onPress={loading ? null : signUpNow} // Disable button while loading
+                onPress={loading ? null : businessSignUpNow} // Disable button while loading
                 >
                   {loading ? <ActivityIndicator color="white" /> : 'Create Account'}
               </Button>
@@ -205,18 +209,17 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? HeaderHeight + 10 : 10, // Adjust for different platform header heights
+    top: Platform.OS === 'ios' ? HeaderHeight + 10 : 10,
     left: 10,
-    zIndex: 1, // Ensure it's above other components
+    zIndex: 1, 
     padding: 10,
   },
-
   image: {
     width: 300,
     height: 250,
     resizeMode: 'contain',
-    alignSelf: 'center', // Center the image horizontally
-    marginTop: 10, // Add margin top as needed
+    alignSelf: 'center', 
+    marginTop: 10, 
     marginLeft: 30,
   },
 
@@ -273,4 +276,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default BusinessSignUp;

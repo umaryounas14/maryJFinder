@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-  import { StyleSheet } from 'react-native';
+  import { StyleSheet, Dimensions } from 'react-native';
   import { Dropdown } from 'react-native-element-dropdown';
-import { transformer } from '../../metro.config';
+  const { width } = Dimensions.get('window');
 
   const data = [
     { label: 'Item 1', value: '1' },
@@ -43,8 +43,8 @@ import { transformer } from '../../metro.config';
 
   const styles = StyleSheet.create({
     dropdown: {
-        width: 320,
-        margin: 5,
+      width: width * 0.9, // Adjust the percentage as needed
+      margin: 5,
         height: 45,
         marginRight: 25,
         borderRadius: 15,

@@ -1,16 +1,18 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import {BASE_URL, login, signUp} from '../../constants/endpoints';
+import { BASE_URL, login, signUp } from '../../constants/endpoints';
+
 const initialState = {
   loading: false,
   error: null,
   accessToken: null,
   user: null,
+  message: ""
 };
 
 export const loginUser = createAsyncThunk(
   'loginUser',
-  async (payload, {dispatch}) => {
+  async (payload, { dispatch }) => {
     try {
       const response = await axios({
         method: 'post',
@@ -27,11 +29,17 @@ export const loginUser = createAsyncThunk(
           scope: payload.scope,
         },
       });
-      return response?.data;
+      return response.data;
     } catch (error) {
-      // Handle errors
-      console.error('Login Error:', error);
-      throw error; // Rethrow error to be caught by the component
+      if (error.response) {
+        if (error.response.status === 400 || error.response.status === 401) {
+          throw error.response.data; 
+        } else {
+
+          console.error('Login Error:', error);
+          throw error; 
+        }
+      }
     }
   },
 );
@@ -53,6 +61,7 @@ export const loginSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.message = action.payload?.message;
       });
   },
 });

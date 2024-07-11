@@ -3,15 +3,23 @@ import {
   configureStore,
 } from '@reduxjs/toolkit';
 import {persistReducer, persistStore} from 'redux-persist';
-import signUpReducer from './slices/signup-slice';
-import loginReducer from './slices/login-slice'
-import userReducer  from './slices/userInfo-slice'
+import signUpReducer from './slices/signUpSlice';
+import loginReducer from './slices/loginSlice'
+import userReducer  from './slices/userInfoSlice'
+import otpReducer from './slices/OtpVerifySlice'
+import businessSignUpReducer from './slices/BusinessSignUpSlice'
+import chatReducer from './slices/chatSlice'
+import googleLoginReducer from './slices/googleLoginSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const rootReducer = combineReducers({
     signUp: signUpReducer,
     login: loginReducer,
-    user: userReducer
+    user: userReducer,
+    otp: otpReducer,
+    businessAccount: businessSignUpReducer,
+    chat: chatReducer,
+    google: googleLoginReducer,
 });
 
 const persistConfig = {

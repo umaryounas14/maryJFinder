@@ -12,10 +12,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
 import DropdownInput from '../components/DropDown';
+import Icon from 'react-native-vector-icons/AntDesign'; 
+
 
 const {width} = Dimensions.get('window');
 
@@ -46,8 +47,10 @@ const AddBusiness = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-        <KeyboardAvoidingView behavior="padding" enabled>
-          <View>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrowleft" size={24} color="#000" />
+          </TouchableOpacity>
+          <View style={{height: 150}}>
             <Image
               source={require('../assets/splash.png')}
               style={styles.image}
@@ -271,7 +274,6 @@ const AddBusiness = ({navigation}) => {
               </Block>
             </Block>
           </Block>
-        </KeyboardAvoidingView>
       </Block>
     </ScrollView>
   );
@@ -281,14 +283,20 @@ const styles = StyleSheet.create({
   signin: {
     marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
   },
-
+  backButton: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? HeaderHeight + 10 : 10, 
+    left: 10,
+    zIndex: 1, 
+    padding: 10,
+  },
   image: {
-    marginTop: 10,
-    width: 200,
-    height: 200,
-    marginLeft: 100,
-    marginBottom: -80,
+    width: 300,
+    height: 250,
     resizeMode: 'contain',
+    alignSelf: 'center', 
+    marginTop: 10, 
+    marginLeft: 30,
   },
 
   input: {

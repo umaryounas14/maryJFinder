@@ -2,8 +2,6 @@ import React, {useState} from 'react';
 import {
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingView,
-  Alert,
   Platform,
   Text,
   View,
@@ -12,9 +10,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '../constants';
 import {HeaderHeight} from '../constants/utils';
+import Icon from 'react-native-vector-icons/AntDesign'; // Import AntDesign icons
 
 const {width} = Dimensions.get('window');
 
@@ -22,8 +20,10 @@ const UpgradePlan = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-        <KeyboardAvoidingView behavior="padding" enabled>
-          <View>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Icon name="arrowleft" size={24} color="#000" />
+          </TouchableOpacity>
+          <View style = {{ height: 150}}>
             <Image
               source={require('../assets/splash.png')}
               style={styles.image}
@@ -40,7 +40,6 @@ const UpgradePlan = ({navigation}) => {
               Upgrade Your Plan
             </Text>
           </Block>
-        </KeyboardAvoidingView>
       </Block>
       <View>
         <View
@@ -58,7 +57,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#ddd"
-            style={{height: 48, width: 280, marginLeft: -2}}
+            style={{height: 48, width: 280, marginLeft: 20}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             Current Plan
           </Button>
@@ -106,7 +105,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#20B340"
-            style={{height: 48, width: 280, marginLeft: -2}}
+            style={{height: 48, width: 280, marginLeft: 20}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             Upgrade to Plus
           </Button>
@@ -164,7 +163,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#0e1373"
-            style={{height: 48, width: 280, marginLeft: -2}}
+            style={{height: 48, width: 280, marginLeft: 20}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             <Text style={{color: 'white', fontSize: 16}}>
               Upgrade to Premium
@@ -218,6 +217,16 @@ const UpgradePlan = ({navigation}) => {
             </View>
           </View>
         </View>
+        <Block center flex style={{marginTop: 20}}>
+          <Button
+            size="medium"
+            shadowless
+            color="#20B340"
+            style={{height: 48}}
+            onPress={() => navigation.navigate('Dashboard')}>
+            Continue
+          </Button>
+        </Block>
       </View>
     </ScrollView>
   );
@@ -228,13 +237,21 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
   },
 
+  backButton: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? HeaderHeight + 10 : 10, // Adjust for different platform header heights
+    left: 10,
+    zIndex: 1, // Ensure it's above other components
+    padding: 10,
+  },
+
   image: {
-    marginTop: 10,
-    width: 200,
-    height: 200,
-    marginLeft: 40,
-    marginBottom: -80,
+    width: 300,
+    height: 250,
     resizeMode: 'contain',
+    alignSelf: 'center', // Center the image horizontally
+    marginTop: 10, // Add margin top as needed
+    marginLeft: 30,
   },
 
   input: {

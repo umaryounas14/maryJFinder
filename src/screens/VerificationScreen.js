@@ -11,9 +11,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {Block, Button, Input, theme} from 'galio-framework';
-import LinearGradient from 'react-native-linear-gradient';
-import {materialTheme} from '../constants';
+import {Block, Input, theme} from 'galio-framework';
 import {HeaderHeight} from '../constants/utils';
 
 const {width} = Dimensions.get('window');
@@ -25,7 +23,6 @@ const Verification = ({navigation}) => {
   };
 
   const handleResendEmail = () => {
-    // Logic to resend email
   };
   return (
     <ScrollView>

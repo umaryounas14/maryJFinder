@@ -1,7 +1,14 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet, Animated} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Animated,
+} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -20,6 +27,13 @@ import ActivateStore from './src/screens/ActiveStore';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import store from './src/redux/store';
+import MyStores from './src/screens/MyStores';
+import Intractions from './src/screens/Intractions';
+import Selection from './src/screens/Selection';
+import BusinessSignUp from './src/screens/BusinessSignUp';
+import OtpVerify from './src/screens/OtpVerify';
+import ChatScreen from './src/screens/ChatScreen';
+import ChatDrawer from './src/routes/ChatDrawer';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -36,8 +50,6 @@ const CustomDrawerContent = ({navigation}) => {
     return selectedScreen === screenName ? styles.selectedItem : styles.item;
   };
 
-
-
   return (
     <DrawerContentScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -46,8 +58,6 @@ const CustomDrawerContent = ({navigation}) => {
           style={styles.image}
         />
       </View>
-
-      {/* Drawer Items */}
       <DrawerItem
         label="Dashboard"
         onPress={() => handleScreenPress('Dashboard')}
@@ -59,13 +69,18 @@ const CustomDrawerContent = ({navigation}) => {
       />
       <DrawerItem
         label="My Stores"
-        onPress={() => handleScreenPress('SignUpScreen')}
-        style={getScreenItemStyle('SignUpScreen')}
+        onPress={() => handleScreenPress('MyStores')}
+        style={getScreenItemStyle('MyStores')}
+      />
+      <DrawerItem
+        label="MaryJfinder Chat"
+        onPress={() => handleScreenPress('ChatScreen')}
+        style={getScreenItemStyle('ChatScreen')}
       />
       <DrawerItem
         label="Intractions"
-        onPress={() => handleScreenPress('SignUpScreen')}
-        style={getScreenItemStyle('SignUpScreen')}
+        onPress={() => handleScreenPress('Intractions')}
+        style={getScreenItemStyle('Intractions')}
       />
       <DrawerItem
         label="Analytics"
@@ -92,15 +107,17 @@ const DrawerNavigator = () => {
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false, // Hide the header
-      }}>
-          <Drawer.Screen name="Dashboard" component={Dashboard} />
-      <Drawer.Screen name="ActivateStore" component={ActivateStore} />
+      }}
+      >
+      <Drawer.Screen name="Dashboard" component={Dashboard} />
+      <Drawer.Screen name="MyStores" component={MyStores} />
+      <Drawer.Screen name="Intractions" component={Intractions} />
     </Drawer.Navigator>
   );
 };
 
 const leftToRightAnimation = {
-  cardStyleInterpolator: ({ current, layouts }) => {
+  cardStyleInterpolator: ({current, layouts}) => {
     return {
       cardStyle: {
         transform: [
@@ -116,15 +133,12 @@ const leftToRightAnimation = {
   },
 };
 
-
-
-
 const App = () => {
   const scaleValue = React.useRef(new Animated.Value(1)).current;
 
   const transitionConfig = {
     animation: 'timing',
-    config: { duration: 200 },
+    config: {duration: 300},
   };
 
   const screenOptions = {
@@ -134,11 +148,12 @@ const App = () => {
     transitionSpec: {
       open: transitionConfig,
       close: transitionConfig,
+
     },
-    cardStyleInterpolator: ({ current: { progress } }) => {
+    cardStyleInterpolator: ({current: {progress}}) => {
       return {
         cardStyle: {
-          transform: [{ scale: Animated.multiply(progress, scaleValue) }],
+          transform: [{scale: Animated.multiply(progress, scaleValue)}],
         },
       };
     },
@@ -150,17 +165,22 @@ const App = () => {
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="Splash"
-            screenOptions={screenOptions}>
+            screenOptions={screenOptions}
+            >
             <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Login" component={Login}  />
-            <Stack.Screen name="Main" component={SignUpScreen}/>
+            <Stack.Screen name="Selection" component={Selection} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Main" component={SignUpScreen} />
             <Stack.Screen name="Verification" component={Verification} />
             <Stack.Screen name="About" component={About} />
             <Stack.Screen name="AboutBusiness" component={AboutBusiness} />
             <Stack.Screen name="UpgradePlan" component={UpgradePlan} />
             <Stack.Screen name="AddBusiness" component={AddBusiness} />
             <Stack.Screen name="Dashboard" component={DrawerNavigator} />
-            <Stack.Screen name="ActivateStore" component={DrawerNavigator} />
+            <Stack.Screen name="ActivateStore" component={ActivateStore} />
+            <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} />
+            <Stack.Screen name="OtpVerify" component={OtpVerify} />
+            <Stack.Screen name="ChatScreen" component={ChatDrawer} />
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

@@ -8,9 +8,9 @@ const SplashScreen = ({ navigation }) => {
             try {
                 const accessToken = await AsyncStorage.getItem('accessToken');
                 if (accessToken) {
-                    navigation.replace('Dashboard');
+                    navigation.replace('ChatScreen');
                 } else {
-                    navigation.replace('Login');
+                    navigation.replace('Selection');
                 }
             } catch (error) {
                 console.error('Error reading access token from AsyncStorage:', error);

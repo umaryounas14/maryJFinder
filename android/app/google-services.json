@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "306978665807",
+    "project_id": "maryjfinder",
+    "storage_bucket": "maryjfinder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306978665807:android:2e7f7319b8f8a58bdf013a",
+        "android_client_info": {
+          "package_name": "com.maryjfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306978665807-unpj3jvq4gmokfkarieu810un5um4idm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.maryjfinder",
+            "certificate_hash": "5a70b90afb60b07caf9848dc7ad02e4d3474742b"
+          }
+        },
+        {
+          "client_id": "306978665807-2irocsjsrbu5vn7ktvitohpnrvkcij6b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuMFRW2FRwrcHWt8RFCm0E4hZYsJj8iz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306978665807-2irocsjsrbu5vn7ktvitohpnrvkcij6b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
