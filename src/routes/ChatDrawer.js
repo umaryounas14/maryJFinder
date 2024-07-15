@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   conversationList: {
-    maxHeight: '60%', // Adjust the maximum height of conversation list as needed
+    maxHeight: '85%', // Adjust the maximum height of conversation list as needed
     marginTop: 10,
   },
   button: {
@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     borderColor: 'red',
     borderWidth: 1,
-    marginHorizontal: 10,
-    marginVertical: 200
+    marginHorizontal: 6,
+    marginVertical: 70
   },
   signUpButtonText: {
     color: 'black',

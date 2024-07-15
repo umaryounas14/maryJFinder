@@ -1,6 +1,15 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  Image,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,21 +22,41 @@ import {
   setMessages,
   sendMessageSuccess,
   selectMessagesForThread,
+  setCreatedAt,
+  setCompleteMessageClear,
+  setIsAiTyping,
 } from '../redux/slices/chatSlice';
+import TypeWriter from 'react-native-typewriter';
+import AnimatedDots from '../components/AnimatedDots';
 
 const BASE_URL = 'https://maryjfinder.com/api/chatbot/chat';
+import aiAvatar from '../assets/mar-j-icon.png'; // Adjust path as necessary
 
 const ChatScreen = ({ route }) => {
   const { threadId } = route.params || { threadId: null };
   const [inputText, setInputText] = useState('');
   const [isLoadingSend, setIsLoadingSend] = useState(false);
-  const [isAiTyping, setIsAiTyping] = useState(false);
 
   const scrollViewRef = useRef();
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const messages = useSelector(state => selectMessagesForThread(state, threadId));
+  const messages = useSelector((state) =>
+    selectMessagesForThread(state, threadId)
+  );
+  const { created_at_cur_msg, isAiTyping } = useSelector(
+    (state) => state.chat
+  );
+
+  // Sample data for chat categories
+  const chatCategories = [
+    { id: 1,  description: 'What Products do You recommend for anxity?' },
+    { id: 2,  description: 'where is the closet dispensry to my location' },
+    { id: 3, description: 'What are the Products Available for pain relief' },
+    { id: 4, description: 'What are the Products Available for pain relief' },
+
+
+  ];
 
   useEffect(() => {
     if (scrollViewRef.current) {
@@ -52,10 +81,12 @@ const ChatScreen = ({ route }) => {
 
         if (response.data.status_code === 200) {
           const fetchedMessages = response.data.body.response || [];
-          console.log(fetchedMessages, "new")
           const processedMessages = processMessages(fetchedMessages);
           dispatch(setMessages({ threadId, messages: processedMessages }));
-          await AsyncStorage.setItem(`currentChatMessages_${threadId}`, JSON.stringify(processedMessages));
+          await AsyncStorage.setItem(
+            `currentChatMessages_${threadId}`,
+            JSON.stringify(processedMessages)
+          );
         } else {
           console.error('Failed to fetch messages:', response.data);
           dispatch(setError('Failed to fetch messages'));
@@ -78,18 +109,20 @@ const ChatScreen = ({ route }) => {
       text: inputText.trim(),
       created_at: new Date().toISOString(),
     };
-
-    dispatch(sendMessageSuccess({ threadId, message: userMessage }));
     setInputText('');
+
+    dispatch(setCompleteMessageClear());
+    dispatch(sendMessageSuccess({ threadId, message: userMessage }));
+    dispatch(setIsAiTyping(true));
     const accessToken = await AsyncStorage.getItem('accessToken');
     try {
       const url = `${BASE_URL}?message=${encodeURIComponent(inputText)}`;
       const params = {};
-      
+
       if (threadId) {
         params.thread_id = threadId;
       }
-
+      dispatch(setCompleteMessageClear());
       const { data } = await axios.get(url, {
         params,
         headers: {
@@ -98,7 +131,6 @@ const ChatScreen = ({ route }) => {
         },
         adapter: 'fetch',
       });
-
       handleEventStream(data);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -106,45 +138,64 @@ const ChatScreen = ({ route }) => {
     }
   };
 
-  const handleEventStream = eventStream => {
-    setIsAiTyping(true);
+  const handleEventStream = (eventStream) => {
     const lines = eventStream.split('\n\n');
     let accumulatedText = '';
-
-    lines.forEach(line => {
+    const created_at = new Date().toISOString();
+    dispatch(setCreatedAt(created_at));
+    lines.forEach((line) => {
       const event = parseEvent(line);
       if (event && event.type === 'thread.message.delta') {
         try {
           const data = JSON.parse(event.data);
-          console.log(data.response, "data")
           accumulatedText = data.response + '';
+          sendCompleteMessage(
+            accumulatedText.trim(),
+            false,
+            created_at
+          );
         } catch (e) {
           console.error('Error parsing delta event data:', e);
         }
-      } else if (event && event.type === 'thread.message.completed') {
-        sendCompleteMessage(accumulatedText.trim());
+      } else if (
+        event &&
+        event.type === 'thread.message.completed'
+      ) {
+        setTimeout(() => {
+          dispatch(setCreatedAt(''));
+        }, 1000);
         accumulatedText = '';
       }
     });
 
-    setIsAiTyping(false);
+    dispatch(setIsAiTyping(false));
   };
 
-  const sendCompleteMessage = messageContent => {
+  const sendCompleteMessage = (
+    messageContent,
+    isMsgComplete,
+    created_at
+  ) => {
     if (messageContent.trim()) {
       const completeMessage = {
         role: 'ai',
         text: messageContent.trim(),
-        created_at: new Date().toISOString(),
+        created_at,
       };
-      dispatch(sendMessageSuccess({ threadId, message: completeMessage }));
+      dispatch(
+        sendMessageSuccess({
+          threadId,
+          message: completeMessage,
+          isMsgComplete,
+        })
+      );
     }
   };
 
-  const parseEvent = input => {
+  const parseEvent = (input) => {
     const event = { type: '', data: '' };
     const lines = input.split('\n');
-    lines.forEach(line => {
+    lines.forEach((line) => {
       const index = line.indexOf(': ');
       if (index > 0) {
         const field = line.substring(0, index);
@@ -162,7 +213,7 @@ const ChatScreen = ({ route }) => {
     return event;
   };
 
-  const formatMessageTime = createdAt => {
+  const formatMessageTime = (createdAt) => {
     const date = new Date(createdAt);
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -189,17 +240,19 @@ const ChatScreen = ({ route }) => {
           text: 'OK',
           onPress: async () => {
             dispatch(setLoading());
-            await AsyncStorage.removeItem(`currentChatMessages_${threadId}`);
+            await AsyncStorage.removeItem(
+              `currentChatMessages_${threadId}`
+            );
           },
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
-  const processMessages = fetchedMessages => {
+  const processMessages = (fetchedMessages) => {
     const processedMessages = [];
-  
+
     fetchedMessages.forEach((message, index) => {
       if (message.message) {
         // User message
@@ -208,7 +261,8 @@ const ChatScreen = ({ route }) => {
           text: message.message,
           created_at: message.created_at,
         });
-      }  if (message.response) {
+      }
+      if (message.response) {
         // AI response corresponding to the last user message
         processedMessages.push({
           role: 'ai',
@@ -217,7 +271,7 @@ const ChatScreen = ({ route }) => {
         });
       }
     });
-  
+
     return processedMessages;
   };
 
@@ -232,35 +286,81 @@ const ChatScreen = ({ route }) => {
           <Icon name="plus" size={30} style={styles.plusIcon} />
         </TouchableOpacity>
       </View>
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.messagesContainer}
-        onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
-        showsVerticalScrollIndicator={false}
-      >
-        {messages.map((message, index) => (
-          <View
-            key={`${message.role}_${index}`}
-            style={[
-              styles.messageContainer,
-              message.role === 'user' ? styles.userMessageContainer : styles.aiMessageContainer,
-            ]}
-          >
-            {message.role === 'user' ? (
-              <Text style={styles.messageText}>{message.text}</Text>
-            ) : (
-              <Markdown>{message.text}</Markdown>
-            )}
-            <Text style={styles.messageTime}>{formatMessageTime(message.created_at)}</Text>
-          </View>
-        ))}
-        {isAiTyping && (
-          <View style={[styles.messageContainer, styles.aiMessageContainer]}>
-            <ActivityIndicator size="small" color="#099D63" />
-            <Text style={styles.messageTime}>Typing...</Text>
-          </View>
-        )}
-      </ScrollView>
+      {threadId ? (
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.messagesContainer}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({ animated: true })
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          {messages?.map((message, index) => (
+            <View
+              key={`${message.role}_${index}`}
+              style={[
+                styles.messageContainer,
+                message?.role === 'user'
+                  ? styles.userMessageContainer
+                  : styles.aiMessageContainer,
+              ]}
+            >
+              <View style={styles.messageContent}>
+                {message?.role === 'user' ? (
+                  <>
+                    <Text style={styles.messageText}>{message.text}</Text>
+                    <Icon
+                      name="user"
+                      size={25}
+                      color="white"
+                      style={styles.messageIcon}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {created_at_cur_msg == message?.created_at ? (
+                      <TypeWriter minDelay={50} typing={2}>
+                        {message?.text}
+                      </TypeWriter>
+                    ) : (
+                      <Markdown>{message?.text}</Markdown>
+                    )}
+                    <Image
+                      source={aiAvatar}
+                      style={styles.messageImage}
+                    />
+                  </>
+                )}
+              </View>
+              <Text style={styles.messageTime}>
+                {formatMessageTime(message.created_at)}
+              </Text>
+            </View>
+          ))}
+          {isAiTyping && (
+            <View style={[styles.messageContainer, styles.aiMessageContainer]}>
+              <AnimatedDots />
+            </View>
+          )}
+        </ScrollView>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.chatCategoriesContainer}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+        >
+          {chatCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={styles.chatCategory}
+            >
+              <Text style={styles.chatCategoryDescription}>
+                {category.description}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
@@ -315,24 +415,75 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingVertical: 20,
     paddingHorizontal: 10,
+    padding: 20,
+    maxWidth: '100%',
+  },
+  chatCategoriesContainer: {
+    flexDirection: 'row',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  chatCategory: {
+    width:150,
+    height: 75,
+    backgroundColor: '#E5E5EA',
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 5,
+    marginTop: 600,
+  },
+  chatCategoryTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  chatCategoryDescription: {
+    fontSize: 14,
   },
   messageContainer: {
     maxWidth: '80%',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
+    marginBottom: 15,
+    position: 'relative',
+    marginTop: 10,
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
     backgroundColor: '#099D63',
+    borderRadius: 10,
+    paddingHorizontal: 10,
   },
   aiMessageContainer: {
     alignSelf: 'flex-start',
     backgroundColor: '#E5E5EA',
+    borderRadius: 10,
+    paddingHorizontal: 5,
+  },
+  messageContent: {
+    position: 'relative',
+    padding: 10,
   },
   messageText: {
     fontSize: 16,
-    color: '#000',
+    color: 'white',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
+  },
+  messageIcon: {
+    position: 'absolute',
+    top: -25,
+    right: -5,
+    zIndex: 1,
+    borderRadius: 20,
+    backgroundColor: 'rgb(73, 163, 241)',
+  },
+  messageImage: {
+    width: 25,
+    height: 25,
+    position: 'absolute',
+    top: -25,
+    left: 10,
+    zIndex: 1,
+    backgroundColor: 'black',
+    borderRadius: 10,
   },
   messageTime: {
     fontSize: 12,

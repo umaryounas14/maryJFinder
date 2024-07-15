@@ -3319,6 +3319,7 @@ __metadata:
     react-native-svg: ^15.3.0
     react-native-svg-charts: ^5.4.0
     react-native-table-component: ^1.2.2
+    react-native-typewriter: ^0.7.0
     react-native-vector-icons: ^10.1.0
     react-redux: ^9.1.2
     react-test-renderer: 18.2.0
@@ -8979,7 +8980,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.5.10, prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -9387,6 +9388,18 @@ __metadata:
   version: 1.2.2
   resolution: "react-native-table-component@npm:1.2.2"
   checksum: 906a0ae3b23bcf4a98237d07853bb416feb3d512a4f28e758470a3c45154f15e92445d57ef272e3c3c24c7355ec6ccbf6b53e7ce917ed1964b9f973084d88c46
+  languageName: node
+  linkType: hard
+
+"react-native-typewriter@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "react-native-typewriter@npm:0.7.0"
+  dependencies:
+    prop-types: ^15.5.7
+  peerDependencies:
+    react: ">=15.4.x"
+    react-native: ">=0.41.x"
+  checksum: 398640d636508f28b8242596fef42d41a7b463d949a70825115691eabd1e3d595f4e5612a950ecff185ef678da3118c06b8cc61bfc36966ed0b471adf470c994
   languageName: node
   linkType: hard
 
