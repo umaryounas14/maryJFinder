@@ -82,7 +82,6 @@ const Login = ({navigation}) => {
 
     try {
       const response = await dispatch(loginUser(payload));
-
       if (response?.payload?.body?.access_token) {
         await AsyncStorage.setItem(
           'accessToken',
@@ -94,7 +93,7 @@ const Login = ({navigation}) => {
         );
 
         console.log('Login Successful!');
-        navigation.navigate('ChatScreen');
+        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],
@@ -140,9 +139,8 @@ const Login = ({navigation}) => {
           'userData',
           JSON.stringify(response?.payload?.body?.user),
         );
-
         console.log('Login Successful!');
-        navigation.navigate('ChatScreen');
+        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],
@@ -183,7 +181,7 @@ const Login = ({navigation}) => {
           'userData',
           JSON.stringify(response?.payload?.body?.user),
         );
-        navigation.navigate('ChatScreen');
+        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],
@@ -225,6 +223,7 @@ const Login = ({navigation}) => {
     try {
       const response = await dispatch(socialLoginGoogle(payload));
 
+
       if (response?.payload?.body?.access_token) {
         await AsyncStorage.setItem(
           'accessToken',
@@ -234,7 +233,7 @@ const Login = ({navigation}) => {
           'userData',
           JSON.stringify(response?.payload?.body?.user),
         );
-        navigation.navigate('ChatScreen');
+        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],

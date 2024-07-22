@@ -19,6 +19,7 @@ import {signUpUser} from '../redux/slices/signUpSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {client_id, client_secret} from '../constants/configs';
 import Icon from 'react-native-vector-icons/AntDesign'; // Import AntDesign icons
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
@@ -61,6 +62,10 @@ const SignUpScreen = ({navigation}) => {
         navigation.navigate('OtpVerify', {email: email, password: password});
       }
       else if (response?.payload?.body?.access_token)
+        await AsyncStorage.setItem(
+          'accessToken',
+          response?.payload?.body?.access_token,
+        );
         navigation.navigate('About');
 
       setLoading(false);

@@ -57,7 +57,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#ddd"
-            style={{height: 48, width: 280, marginLeft: 20}}
+            style={{height: 48, width: 280, marginLeft:1}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             Current Plan
           </Button>
@@ -105,7 +105,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#20B340"
-            style={{height: 48, width: 280, marginLeft: 20}}
+            style={{height: 48, width: 280, marginLeft: 1}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             Upgrade to Plus
           </Button>
@@ -163,7 +163,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#0e1373"
-            style={{height: 48, width: 280, marginLeft: 20}}
+            style={{height: 48, width: 280, marginLeft: 1}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             <Text style={{color: 'white', fontSize: 16}}>
               Upgrade to Premium
@@ -223,7 +223,7 @@ const UpgradePlan = ({navigation}) => {
             shadowless
             color="#20B340"
             style={{height: 48}}
-            onPress={() => navigation.navigate('Dashboard')}>
+            onPress={() => navigation.navigate('ChatScreen')}>
             Continue
           </Button>
         </Block>

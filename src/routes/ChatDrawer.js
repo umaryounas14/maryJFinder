@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Text, View, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -7,20 +7,21 @@ import ChatScreen from '../screens/ChatScreen';
 
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversations, isLoading }) => {
-  const handleLogin = () => {
-    navigation.navigate('Login');
+const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversations, fetchConversations, isLoadingConversations, isLoadingMore, fetchMoreConversations }) => {
+  const navigateToChat = (threadId) => {
+    navigation.navigate('ChatScreen', { threadId });
   };
 
   const handleSignUp = () => {
     navigation.navigate('Main');
   };
 
-  const navigateToChat = (threadId) => {
-    navigation.navigate('ChatScreen', { threadId }); // Pass threadId as a parameter
+  const handleLogin = () => {
+    navigation.navigate('Login');
   };
- 
-  if (isLoading) {
+
+  // Loader for initial conversations fetch
+  if (isLoadingConversations && conversations.length === 0) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#099D63" />
@@ -29,34 +30,38 @@ const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversatio
   }
 
   return (
-    <DrawerContentScrollView contentContainerStyle={styles.drawerContent}>
-      <View>
-        {!isLoggedIn && (
-          <TouchableOpacity
-            style={styles.newChatContainer}
-            onPress={() => navigation.navigate('ChatScreen')}
-          >
-            <Text style={styles.newChatText}>New Chat</Text>
-          </TouchableOpacity>
-        )}
-        {isLoggedIn && conversations && conversations.length > 0 && (
-          <ScrollView style={styles.conversationList}>
-            {conversations.map((conversation) => (
-              <DrawerItem
-                key={conversation.id}
-                label={conversation.message} // Displaying last_response instead of message
-                onPress={() => navigateToChat(conversation.thread_id)}
-              />
-            ))}
-          </ScrollView>
-        )}
+    <View style={styles.drawerContent}>
+      {!isLoggedIn && (
         <TouchableOpacity
-          style={[styles.button, styles.logOutButton]}
-          onPress={handleLogout}
+          style={styles.newChatContainer}
+          onPress={() => navigation.navigate('ChatScreen')}
         >
-          <Text style={[styles.buttonText, styles.signUpButtonText]}>Logout</Text>
+          <Text style={styles.newChatText}>New Chat</Text>
         </TouchableOpacity>
-      </View>
+      )}
+      {isLoggedIn && (
+        <FlatList
+          data={conversations}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <DrawerItem
+              key={item.id}
+              label={item.message}
+              onPress={() => navigateToChat(item.thread_id)}
+            />
+          )}
+          onEndReachedThreshold={0.1}
+          onEndReached={fetchMoreConversations} // Only trigger fetchMoreConversations on end reached
+          style={styles.conversationList}
+          ListFooterComponent={isLoadingMore && <ActivityIndicator size="small" color="#099D63" />}
+        />
+      )}
+      <TouchableOpacity
+        style={[styles.button, styles.logOutButton]}
+        onPress={handleLogout}
+      >
+        <Text style={[styles.buttonText, styles.signUpButtonText]}>Logout</Text>
+      </TouchableOpacity>
       {!isLoggedIn && (
         <View style={styles.bottomButtons}>
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
@@ -70,14 +75,92 @@ const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversatio
           </TouchableOpacity>
         </View>
       )}
-    </DrawerContentScrollView>
+    </View>
   );
 };
 
 const ChatDrawer = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [conversations, setConversations] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingConversations, setIsLoadingConversations] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalPages, setTotalPages] = useState(1); // Initialize with 1, assuming at least one page
+  const currentPageRef = useRef(1); // Ref for currentPage
+
+  const fetchConversations = useCallback(async () => {
+    try {
+      setIsLoadingConversations(true); // Start loading initial conversations
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const headers = {
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      };
+
+      const response = await axios.get('https://maryjfinder.com/api/chatbot/conversations', {
+        headers: headers,
+        params: { page: currentPageRef.current }
+      });
+
+      if (response.data.status_code === 200) {
+        setConversations(response.data.body.response); // Set initial conversations
+        setTotalPages(response.data.body.total_pages); // Set total pages
+        currentPageRef.current += 1; // Update currentPage using ref
+      } else {
+        console.error('Failed to fetch conversations:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    } finally {
+      setIsLoadingConversations(false); // Stop loading initial conversations
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem('accessToken');
+      setIsLoggedIn(false);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Selection' }],
+      });
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  }, [navigation]);
+
+  const fetchMoreConversations = useCallback(async () => {
+    try {
+      if (!isLoadingMore && currentPageRef.current <= totalPages) {
+        setIsLoadingMore(true); // Start loading more conversations
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        const headers = {
+          Accept: 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        };
+
+        const response = await axios.get('https://maryjfinder.com/api/chatbot/conversations', {
+          headers: headers,
+          params: { page: currentPageRef.current }
+        });
+
+        if (response.data.status_code === 200) {
+          setConversations((prevConversations) => [...prevConversations, ...response.data.body.response]);
+          currentPageRef.current += 1; // Update currentPage using ref
+          setTotalPages(response.data.body.total_pages); // Update totalPages based on response
+        } else {
+          console.error('Failed to fetch more conversations:', response.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching more conversations:', error);
+    } finally {
+      setIsLoadingMore(false); // Stop loading more conversations
+    }
+  }, [isLoadingMore, totalPages]);
 
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -92,47 +175,6 @@ const ChatDrawer = ({ navigation }) => {
     checkLoggedIn();
   }, []);
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        const headers = {
-          Accept: 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        };
-
-        const response = await axios.get('https://maryjfinder.com/api/chatbot/conversations', {
-          headers: headers,
-        });
-
-        if (response.data.status_code === 200) {
-          setConversations(response.data.body.response || []);
-        } else {
-          console.error('Failed to fetch conversations:', response.data);
-        }
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchConversations();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('accessToken');
-      setIsLoggedIn(false);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Selection' }],
-      });
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
   return (
     <Drawer.Navigator
       initialRouteName="ChatScreen"
@@ -142,7 +184,10 @@ const ChatDrawer = ({ navigation }) => {
           isLoggedIn={isLoggedIn}
           handleLogout={handleLogout}
           conversations={conversations}
-          isLoading={isLoading}
+          fetchConversations={fetchConversations}
+          isLoadingConversations={isLoadingConversations}
+          isLoadingMore={isLoadingMore}
+          fetchMoreConversations={fetchMoreConversations}
         />
       )}
       drawerPosition="right"
@@ -158,7 +203,6 @@ const ChatDrawer = ({ navigation }) => {
         drawerStyle: { width: '70%' },
       }}
     >
-      {/* Define your drawer screens here */}
       <Drawer.Screen name="ChatScreen" component={ChatScreen} />
     </Drawer.Navigator>
   );
@@ -168,7 +212,7 @@ const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingBottom: 60, // Space at the bottom for buttons
+    paddingBottom: 60,
   },
   newChatContainer: {
     flexDirection: 'row',
@@ -183,7 +227,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   conversationList: {
-    maxHeight: '85%', // Adjust the maximum height of conversation list as needed
+    flex: 1, // Ensure FlatList takes the available space
     marginTop: 10,
   },
   button: {
@@ -191,7 +235,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 90,
     borderRadius: 10,
-    marginBottom: 10, // Add margin between buttons
+    marginBottom: 10,
   },
   buttonText: {
     color: 'white',
@@ -208,7 +252,8 @@ const styles = StyleSheet.create({
     borderColor: 'red',
     borderWidth: 1,
     marginHorizontal: 6,
-    marginVertical: 70
+    marginVertical: 2,
+    marginBottom: 5
   },
   signUpButtonText: {
     color: 'black',

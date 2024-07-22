@@ -21,6 +21,7 @@ import {client_id, client_secret} from '../constants/configs';
 import { businessSignUp } from '../redux/slices/BusinessSignUpSlice';
 const {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/AntDesign'; // Import AntDesign icons
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -66,6 +67,10 @@ const BusinessSignUp = ({navigation}) => {
         navigation.navigate('OtpVerify' , { email: email, password: password });
       }
       else if (response?.payload?.body?.access_token)
+        await AsyncStorage.setItem(
+          'accessToken',
+          response?.payload?.body?.access_token,
+        );
         navigation.navigate('AboutBusiness');
       setLoading(false);
     } catch (error) {
