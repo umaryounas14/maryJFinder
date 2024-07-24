@@ -39,7 +39,6 @@ const chatSlice = createSlice({
     },
     sendMessageSuccess(state, action) {
       const {threadId, message} = action.payload;
-      console.log('state.completeMessage', state.completeMessage);
       state.completeMessage = state?.completeMessage.concat(`${message.text} `);
 
       if (!state.threads[threadId]) {
@@ -50,7 +49,7 @@ const chatSlice = createSlice({
       const index = state?.threads[threadId]?.findIndex(
         item => item?.created_at == message?.created_at,
       );
-      if (index > 0) {
+      if (index > -1) {
         state.threads[threadId][index].text = state.completeMessage;
       } else {
         state.threads[threadId].push(message); // Push message to the specified thread

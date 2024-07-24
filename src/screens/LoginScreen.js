@@ -23,6 +23,7 @@ import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 import {client_id, client_secret, web_client_id} from '../constants/configs';
 import {loginUser} from '../redux/slices/loginSlice';
 import {socialLoginGoogle} from '../redux/slices/googleLoginSlice';
+import { BASE_URL } from '../constants/endpoints';
 const {width} = Dimensions.get('window');
 
 const Login = ({navigation}) => {
@@ -34,6 +35,97 @@ const Login = ({navigation}) => {
     email: false,
     password: false,
   });
+
+  const storeTokensAndUserData = async (accessToken, refreshToken, expiresIn, user) => {
+    try {
+      const expiryDate = new Date(Date.now() + expiresIn * 1000); // Calculate expiry date
+      await AsyncStorage.setItem('accessToken', accessToken);
+      await AsyncStorage.setItem('refreshToken', refreshToken);
+      await AsyncStorage.setItem('accessTokenExpiry', expiryDate.toString()); // Store expiry date
+      await AsyncStorage.setItem('userData', JSON.stringify(user));
+    } catch (error) {
+      console.error('Error storing tokens and user data:', error);
+      throw error;
+    }
+  };
+
+
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        throw new Error('Refresh token not found');
+      }
+      const payload = {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: client_id,
+        client_secret: client_secret,
+        scope: '',
+      };
+     
+      const response = await fetch(`${BASE_URL}token/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh token');
+      }
+
+      const data = await response.json();
+
+      // Update AsyncStorage with new access token
+      await AsyncStorage.setItem('accessToken', data.access_token);
+
+      return data.access_token;
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const checkTokenValidity = async () => {
+      try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          // No access token found, user needs to login
+          return;
+        }
+
+        // Check expiry date
+        const expiryDateString = await AsyncStorage.getItem('accessTokenExpiry');
+        if (!expiryDateString) {
+          throw new Error('Access token expiry information not found');
+        }
+
+        const expiryDate = new Date(expiryDateString);
+        if (expiryDate > new Date()) {
+          // Access token is valid, continue with app initialization
+          return;
+        }
+
+        // Access token expired, refresh it
+        const refreshedAccessToken = await refreshAccessToken();
+        if (refreshedAccessToken) {
+          // Update state or context with refreshed access token
+        } else {
+          // Handle error refreshing token or re-authentication
+          // Redirect to login screen or display error message
+        }
+      } catch (error) {
+        console.error('Error checking token validity:', error);
+        // Handle error checking token validity
+      }
+    };
+
+    checkTokenValidity();
+  }, []);
 
   const config = {
     issuer: 'https://login.microsoftonline.com/common',
@@ -82,30 +174,28 @@ const Login = ({navigation}) => {
 
     try {
       const response = await dispatch(loginUser(payload));
+
       if (response?.payload?.body?.access_token) {
-        await AsyncStorage.setItem(
-          'accessToken',
-          response?.payload?.body?.access_token,
-        );
-        await AsyncStorage.setItem(
-          'userData',
-          JSON.stringify(response?.payload?.body?.user),
+        const { access_token, refresh_token, expires_in, user } = response.payload.body;        
+        await storeTokensAndUserData(
+          access_token,
+          refresh_token,
+          expires_in,
+          user
         );
 
         console.log('Login Successful!');
-        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
+        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token  });
         navigation.reset({
           index: 0,
-          routes: [{name: 'ChatScreen'}],
+          routes: [{ name: 'ChatScreen' }],
         });
-      } else if (response?.error) {
-        console.log(response.error.message, 'message');
-        Alert.alert(response.error.message);
+      } else {
+        throw new Error('Login failed');
       }
     } catch (error) {
-      Alert.alert(
-        'An error occurred while logging in. Please try again later.',
-      );
+      console.error('Error logging in:', error);
+      Alert.alert('An error occurred while logging in. Please try again later.');
     } finally {
       setLoading(false);
     }

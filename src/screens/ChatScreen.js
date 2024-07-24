@@ -1,3 +1,5 @@
+// ChatScreen.js
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -28,13 +30,14 @@ import {
 } from '../redux/slices/chatSlice';
 import TypeWriter from 'react-native-typewriter';
 import AnimatedDots from '../components/AnimatedDots';
+import aiAvatar from '../assets/mar-j-icon.png';
+import centerImage from '../assets/test.png';
+import { useTheme, lightTheme, darkTheme } from '../context/themeContext';
 
 const BASE_URL = 'https://maryjfinder.com/api/chatbot/chat';
 
-// Import your AI avatar/image asset
-import aiAvatar from '../assets/mar-j-icon.png'; // Adjust path as necessary
-
 const ChatScreen = ({ route }) => {
+  const { theme, toggleTheme, isDarkTheme } = useTheme();
   const { threadId, accessToken } = route.params || {
     threadId: null,
     accessToken: null,
@@ -53,6 +56,7 @@ const ChatScreen = ({ route }) => {
   const { created_at_cur_msg, isAiTyping } = useSelector(
     (state) => state.chat
   );
+
   useEffect(() => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
@@ -100,11 +104,12 @@ const ChatScreen = ({ route }) => {
     }
   }, [dispatch, threadId]);
 
-  const sendMessage = async () => {
-    if (!inputText.trim()) return;
+  const sendMessage = (messageText) => {
+    if (!messageText.trim()) return;
+
     const userMessage = {
       role: 'user',
-      text: inputText.trim(),
+      text: messageText.trim(),
       created_at: new Date().toISOString(),
     };
     setInputText('');
@@ -112,33 +117,38 @@ const ChatScreen = ({ route }) => {
     dispatch(setCompleteMessageClear());
     dispatch(sendMessageSuccess({ threadId, message: userMessage }));
     dispatch(setIsAiTyping(true));
-    const accessToken = await AsyncStorage.getItem('accessToken');
-    try {
-      const url = `${BASE_URL}?message=${encodeURIComponent(inputText)}`;
-      const params = {};
 
-      if (threadId) {
-        params.thread_id = threadId;
-      }
-      dispatch(setCompleteMessageClear());
-      const { data } = await axios.get(url, {
-        params,
-        headers: {
-          Accept: 'text/event-stream',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        adapter: 'fetch',
+    AsyncStorage.getItem('accessToken')
+      .then((accessToken) => {
+        const url = `${BASE_URL}?message=${encodeURIComponent(messageText)}`;
+        const params = {};
+
+        if (threadId) {
+          params.thread_id = threadId;
+        }
+        dispatch(setCompleteMessageClear());
+        return axios.get(url, {
+          params,
+          headers: {
+            Accept: 'text/event-stream',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          adapter: 'fetch',
+        });
+      })
+      .then((response) => {
+        handleEventStream(response.data);
+      })
+      .catch((error) => {
+        console.error('Error sending message:', error);
+        dispatch(setError(error.message));
       });
-      handleEventStream(data);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      dispatch(setError(error.message));
-    }
   };
 
   const handleEventStream = (eventStream) => {
     const lines = eventStream.split('\n\n');
     let accumulatedText = '';
+    let threadId = null;
     const created_at = new Date().toISOString();
     dispatch(setCreatedAt(created_at));
 
@@ -151,12 +161,16 @@ const ChatScreen = ({ route }) => {
           sendCompleteMessage(
             accumulatedText.trim(),
             false,
-            created_at
+            created_at,
+            threadId
           );
         } catch (e) {
           console.error('Error parsing delta event data:', e);
         }
-      } else if (event && event.type === 'thread.message.completed') {
+      }
+      if (event && event.type === 'thread.message.completed') {
+        const data = JSON.parse(event.data);
+        threadId = data.thread_id; // Update threadId when completed event provides it
         setTimeout(() => {
           dispatch(setCreatedAt(''));
         }, 1000);
@@ -225,8 +239,8 @@ const ChatScreen = ({ route }) => {
 
   const startNewChat = () => {
     Alert.alert(
-      'Clear Chat',
-      'Are you sure you want to clear all messages?',
+      'New Chat',
+      'Are you sure you want to start new chat?',
       [
         {
           text: 'Cancel',
@@ -236,9 +250,9 @@ const ChatScreen = ({ route }) => {
           text: 'OK',
           onPress: async () => {
             dispatch(setLoading());
-            await AsyncStorage.removeItem(
-              `currentChatMessages_${threadId}`
-            );
+            await AsyncStorage.removeItem(`currentChatMessages_${threadId}`);
+            dispatch(setMessages({ threadId: null, messages: [] }));
+            navigation.navigate('ChatScreen');
           },
         },
       ],
@@ -269,14 +283,14 @@ const ChatScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.banner}>
         <TouchableOpacity onPress={openDrawer}>
-          <Icon name="menu" size={30} style={styles.drawerIcon} />
+          <Icon name="menu" size={28} style={[styles.drawerIcon, { color: theme.colors.primary }]} />
         </TouchableOpacity>
-        <Text style={styles.bannerText}>MaryJfinder Chat</Text>
+        <Text style={[styles.bannerText, { color: theme.colors.primary }]}>MaryJfinder Chat</Text>
         <TouchableOpacity onPress={startNewChat}>
-          <Icon name="plus" size={30} style={styles.plusIcon} />
+          <Icon name="edit" size={25} style={[styles.plusIcon, { color: theme.colors.primary }]} />
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -289,7 +303,7 @@ const ChatScreen = ({ route }) => {
       >
         {isLoadingMessages ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#099D63" />
+            <ActivityIndicator size="small" color={theme.colors.primary} />
           </View>
         ) : (
           <>
@@ -306,31 +320,28 @@ const ChatScreen = ({ route }) => {
                 <View style={styles.messageContent}>
                   {message?.role === 'user' ? (
                     <>
-                      <Text style={styles.messageText}>{message.text}</Text>
+                      <Text style={[styles.messageText, { color: theme.colors.text }]}>{message.text}</Text>
                       <Icon
                         name="user"
                         size={25}
-                        color="white"
+                        color="black"
                         style={styles.messageIcon}
                       />
                     </>
                   ) : (
                     <>
                       {created_at_cur_msg == message?.created_at ? (
-                        <TypeWriter minDelay={50} typing={2}>
+                        <TypeWriter minDelay={50} typing={2} style={{ color: theme.colors.text }}>
                           {message?.text}
                         </TypeWriter>
                       ) : (
-                        <Markdown>{message?.text}</Markdown>
+                        <Markdown style={{ color: theme.colors.text }}>{message?.text}</Markdown>
                       )}
-                      <Image
-                        source={aiAvatar}
-                        style={styles.messageImage}
-                      />
+                      <Image source={aiAvatar} style={styles.messageImage} />
                     </>
                   )}
                 </View>
-                <Text style={styles.messageTime}>
+                <Text style={[styles.messageTime, { color: theme.colors.text }]}>
                   {formatMessageTime(message?.created_at)}
                 </Text>
               </View>
@@ -343,19 +354,76 @@ const ChatScreen = ({ route }) => {
           </View>
         )}
       </ScrollView>
+      {messages.length === 0 && !isLoadingMessages && (
+        <View style={styles.centerImageContainer}>
+          <Image source={centerImage} style={styles.centerImage} />
+        </View>
+      )}
+      {messages.length === 0 && !isLoadingMessages && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.recommendationContainer}
+        >
+          {/* Render four separate recommendation blocks */}
+          <TouchableOpacity
+            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            onPress={() => {
+              sendMessage('What product do you recommend for anxiety?');
+            }}
+          >
+            <Text style={{ marginBottom: 20, fontSize: 14, marginLeft: 5, color: theme.colors.text }}>
+              What product do you recommend for anxiety?
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            onPress={() =>
+              sendMessage(
+                'Where is the closest dispensary near to my location?'
+              )
+            }
+          >
+            <Text style={{ marginBottom: 20, fontSize: 14, marginLeft: 5, color: theme.colors.text }}>
+              Where is the closest dispensary near to my location?
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            onPress={() =>
+              sendMessage('What products are available for pain relief?')
+            }
+          >
+            <Text style={{ marginBottom: 20, fontSize: 14, marginLeft: 5, color: theme.colors.text }}>
+              What products are available for pain relief?
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            onPress={() =>
+              sendMessage('Can you recommend a dispensary near me?')
+            }
+          >
+            <Text style={{ marginBottom: 20, fontSize: 14, color: theme.colors.text }}>
+              Can you recommend a dispensary near me?
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { backgroundColor: theme.colors.secondary, color: theme.colors.text }]}
           placeholder="Type your message..."
+          placeholderTextColor={theme.colors.text}
           value={inputText}
           onChangeText={setInputText}
-          onSubmitEditing={sendMessage}
+          onSubmitEditing={() => sendMessage(inputText)}
           blurOnSubmit={false}
           editable={!isLoadingSend}
         />
         <TouchableOpacity
-          style={styles.sendButton}
-          onPress={sendMessage}
+          style={[styles.sendButton, { backgroundColor: "black",}, ]}
+          onPress={() => sendMessage(inputText)}
           disabled={isLoadingSend}
         >
           {isLoadingSend ? (
@@ -372,26 +440,17 @@ const ChatScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
   },
   banner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F7F7F7',
     paddingVertical: 15,
     paddingHorizontal: 20,
   },
   bannerText: {
-    color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
-  },
-  drawerIcon: {
-    color: 'black',
-  },
-  plusIcon: {
-    color: 'black',
   },
   messagesContainer: {
     flexGrow: 1,
@@ -408,26 +467,24 @@ const styles = StyleSheet.create({
   },
   userMessageContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#E5E5EA',
     borderRadius: 10,
     paddingHorizontal: 10,
     marginRight: 15,
   },
   aiMessageContainer: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F7F7F7',
     borderRadius: 10,
     paddingHorizontal: 5,
     width: '100%',
     marginLeft: 10,
+    backgroundColor: lightTheme.colors.primary
   },
   messageContent: {
     position: 'relative',
     padding: 10,
   },
   messageText: {
-    fontSize: 16,
-    color: 'black',
+    fontSize: 14,
     flexWrap: 'wrap',
     maxWidth: '100%',
   },
@@ -436,7 +493,7 @@ const styles = StyleSheet.create({
     top: -15,
     right: -35,
     zIndex: 1,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: 'rgb(73, 163, 241)',
   },
   messageImage: {
@@ -450,24 +507,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   messageTime: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 5,
+    fontSize: 10,
+    marginTop: 2,
     textAlign: 'right',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F7F7F7',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#F7F7F7',
   },
   textInput: {
     flex: 1,
     height: 40,
-    backgroundColor: '#E5E5EA',
     borderRadius: 20,
     paddingHorizontal: 15,
     marginRight: 10,
@@ -475,10 +527,35 @@ const styles = StyleSheet.create({
   sendButton: {
     width: 40,
     height: 40,
-    backgroundColor: 'black',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  centerImageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  centerImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  recommendationContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  recommendationBlock: {
+    width: 140,
+    height: 100,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    marginTop: 20,
   },
 });
 

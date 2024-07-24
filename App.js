@@ -34,7 +34,7 @@ import BusinessSignUp from './src/screens/BusinessSignUp';
 import OtpVerify from './src/screens/OtpVerify';
 import ChatScreen from './src/screens/ChatScreen';
 import ChatDrawer from './src/routes/ChatDrawer';
-
+import { ThemeProvider } from './src/context/themeContext';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -107,8 +107,7 @@ const DrawerNavigator = () => {
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false, // Hide the header
-      }}
-      >
+      }}>
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="MyStores" component={MyStores} />
       <Drawer.Screen name="Intractions" component={Intractions} />
@@ -116,22 +115,6 @@ const DrawerNavigator = () => {
   );
 };
 
-const leftToRightAnimation = {
-  cardStyleInterpolator: ({current, layouts}) => {
-    return {
-      cardStyle: {
-        transform: [
-          {
-            translateX: current.progress.interpolate({
-              inputRange: [0, 1],
-              outputRange: [-layouts.screen.width, 0],
-            }),
-          },
-        ],
-      },
-    };
-  },
-};
 
 const App = () => {
   const scaleValue = React.useRef(new Animated.Value(1)).current;
@@ -148,7 +131,6 @@ const App = () => {
     transitionSpec: {
       open: transitionConfig,
       close: transitionConfig,
-
     },
     cardStyleInterpolator: ({current: {progress}}) => {
       return {
@@ -160,13 +142,13 @@ const App = () => {
   };
 
   return (
+    <ThemeProvider>
     <Provider store={store.store}>
       <PersistGate loading={null} persistor={store.persistor}>
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="Splash"
-            screenOptions={screenOptions}
-            >
+            screenOptions={screenOptions}>
             <Stack.Screen name="Splash" component={SplashScreen} />
             <Stack.Screen name="Selection" component={Selection} />
             <Stack.Screen name="Login" component={Login} />
@@ -185,6 +167,7 @@ const App = () => {
         </NavigationContainer>
       </PersistGate>
     </Provider>
+    </ThemeProvider>
   );
 };
 

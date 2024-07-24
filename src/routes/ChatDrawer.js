@@ -4,10 +4,22 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@rea
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ChatScreen from '../screens/ChatScreen';
+import { ThemeProvider , useTheme, lightTheme, darkTheme} from '../context/themeContext';
 
 const Drawer = createDrawerNavigator();
 
-const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversations, fetchConversations, isLoadingConversations, isLoadingMore, fetchMoreConversations }) => {
+const CustomDrawerContent = ({
+  navigation,
+  isLoggedIn,
+  handleLogout,
+  conversations,
+  fetchConversations,
+  isLoadingConversations,
+  isLoadingMore,
+  fetchMoreConversations,
+}) => {
+  const { theme, toggleTheme, isDarkTheme } = useTheme();
+
   const navigateToChat = (threadId) => {
     navigation.navigate('ChatScreen', { threadId });
   };
@@ -30,31 +42,48 @@ const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversatio
   }
 
   return (
-    <View style={styles.drawerContent}>
+    <View style={[styles.drawerContent, { backgroundColor: theme.colors.background }]}>
       {!isLoggedIn && (
         <TouchableOpacity
           style={styles.newChatContainer}
           onPress={() => navigation.navigate('ChatScreen')}
         >
-          <Text style={styles.newChatText}>New Chat</Text>
+          <Text style={[styles.newChatText, { color: theme.colors.text }]}>New Chat</Text>
         </TouchableOpacity>
       )}
       {isLoggedIn && (
-        <FlatList
-          data={conversations}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <DrawerItem
-              key={item.id}
-              label={item.message}
-              onPress={() => navigateToChat(item.thread_id)}
+        <>
+          {conversations.length === 0 && (
+            <TouchableOpacity
+              style={styles.newChatContainer}
+              onPress={() => navigation.navigate('ChatScreen')}
+            >
+              <Text style={[styles.newChatText, { color: theme.colors.text }]}>Start New Chat</Text>
+            </TouchableOpacity>
+          )}
+          {conversations.length > 0 && (
+            <FlatList
+              data={conversations}
+              keyExtractor={(item, index) => index.toString()}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <DrawerItem
+                  key={item.id}
+                  label={item.message}
+                  onPress={() => navigateToChat(item.thread_id)}
+                  style={{ backgroundColor: theme.colors.card }}
+                  labelStyle={{ color: theme.colors.text }}
+                />
+              )}
+              onEndReachedThreshold={0.1}
+              onEndReached={fetchMoreConversations} // Only trigger fetchMoreConversations on end reached
+              style={styles.conversationList}
+              ListFooterComponent={
+                isLoadingMore && <ActivityIndicator size="small" color="#099D63" />
+              }
             />
           )}
-          onEndReachedThreshold={0.1}
-          onEndReached={fetchMoreConversations} // Only trigger fetchMoreConversations on end reached
-          style={styles.conversationList}
-          ListFooterComponent={isLoadingMore && <ActivityIndicator size="small" color="#099D63" />}
-        />
+        </>
       )}
       <TouchableOpacity
         style={[styles.button, styles.logOutButton]}
@@ -75,6 +104,16 @@ const CustomDrawerContent = ({ navigation, isLoggedIn, handleLogout, conversatio
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Toggle Theme Button */}
+      <TouchableOpacity
+        style={[styles.colorButton, { backgroundColor: isDarkTheme ? 'black' : '#1f1f1f', borderColor: isDarkTheme ? '#20B340' : '#ffffff' }]}
+        onPress={toggleTheme}
+      >
+        <Text style={[styles.buttonText, { color: isDarkTheme ? '#20B340' : '#ffffff' }]}>
+          {isDarkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -84,8 +123,8 @@ const ChatDrawer = ({ navigation }) => {
   const [conversations, setConversations] = useState([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [totalPages, setTotalPages] = useState(1); // Initialize with 1, assuming at least one page
   const currentPageRef = useRef(1); // Ref for currentPage
+  const totalPages = 22; // Example, should be fetched from API
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -103,7 +142,6 @@ const ChatDrawer = ({ navigation }) => {
 
       if (response.data.status_code === 200) {
         setConversations(response.data.body.response); // Set initial conversations
-        setTotalPages(response.data.body.total_pages); // Set total pages
         currentPageRef.current += 1; // Update currentPage using ref
       } else {
         console.error('Failed to fetch conversations:', response.data);
@@ -150,7 +188,6 @@ const ChatDrawer = ({ navigation }) => {
         if (response.data.status_code === 200) {
           setConversations((prevConversations) => [...prevConversations, ...response.data.body.response]);
           currentPageRef.current += 1; // Update currentPage using ref
-          setTotalPages(response.data.body.total_pages); // Update totalPages based on response
         } else {
           console.error('Failed to fetch more conversations:', response.data);
         }
@@ -176,35 +213,36 @@ const ChatDrawer = ({ navigation }) => {
   }, []);
 
   return (
-    <Drawer.Navigator
-      initialRouteName="ChatScreen"
-      drawerContent={(props) => (
-        <CustomDrawerContent
-          {...props}
-          isLoggedIn={isLoggedIn}
-          handleLogout={handleLogout}
-          conversations={conversations}
-          fetchConversations={fetchConversations}
-          isLoadingConversations={isLoadingConversations}
-          isLoadingMore={isLoadingMore}
-          fetchMoreConversations={fetchMoreConversations}
-        />
-      )}
-      drawerPosition="right"
-      drawerType="slide"
-      drawerStyle={{ width: '70%' }}
-      overlayColor="transparent"
-      screenOptions={{
-        swipeEnabled: true,
-        gestureEnabled: true,
-        headerShown: false,
-        drawerHideStatusBarOnOpen: true,
-        drawerIndicatorStyle: { marginRight: 0 },
-        drawerStyle: { width: '70%' },
-      }}
-    >
-      <Drawer.Screen name="ChatScreen" component={ChatScreen} />
-    </Drawer.Navigator>
+    <ThemeProvider>
+      <Drawer.Navigator
+        initialRouteName="ChatScreen"
+        drawerContent={(props) => (
+          <CustomDrawerContent
+            {...props}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+            conversations={conversations}
+            fetchConversations={fetchConversations}
+            isLoadingConversations={isLoadingConversations}
+            isLoadingMore={isLoadingMore}
+            fetchMoreConversations={fetchMoreConversations}
+          />
+        )}
+        screenOptions={{
+          animationEnabled: true,
+          swipeEnabled: true,
+          gestureEnabled: true,
+          headerShown: false,
+          drawerIndicatorStyle: { marginRight: 0 },
+          drawerStyle: { width: '65%' },
+          overlayColor: 'transparent',
+          drawerType: "slide",
+          drawerAnimation: 'slide', // Explicitly set drawer animation type
+        }}
+      >
+        <Drawer.Screen name="ChatScreen" component={ChatScreen} />
+      </Drawer.Navigator>
+    </ThemeProvider>
   );
 };
 
@@ -223,40 +261,45 @@ const styles = StyleSheet.create({
   newChatText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'black',
     marginLeft: 10,
   },
   conversationList: {
-    flex: 1, // Ensure FlatList takes the available space
+    flex: 1,
     marginTop: 10,
   },
   button: {
-    backgroundColor: '#20B340',
     paddingVertical: 20,
-    paddingHorizontal: 90,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  colorButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 5,
     borderRadius: 10,
     marginBottom: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 20
   },
   buttonText: {
-    color: 'white',
     fontSize: 15,
     textAlign: 'center',
   },
   signUpButton: {
-    backgroundColor: 'white',
     borderColor: '#20B340',
     borderWidth: 1,
   },
   logOutButton: {
-    backgroundColor: 'red',
-    borderColor: 'red',
+    backgroundColor: '#429e5a',
+    borderColor: '#429e5a',
     borderWidth: 1,
-    marginHorizontal: 6,
+    marginHorizontal: 2,
     marginVertical: 2,
     marginBottom: 5
   },
   signUpButtonText: {
-    color: 'black',
+    color: 'white',
   },
   loadingContainer: {
     flex: 1,

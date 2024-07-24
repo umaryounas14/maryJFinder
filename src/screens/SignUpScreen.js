@@ -56,17 +56,19 @@ const SignUpScreen = ({navigation}) => {
         scope: '',
       };
       const response = await dispatch(signUpUser(payload));
-      console.log(response, 'message');
 
       if (response?.payload?.body?.message) {
         navigation.navigate('OtpVerify', {email: email, password: password});
       }
-      else if (response?.payload?.body?.access_token)
+       if (response?.payload?.body?.access_token)
         await AsyncStorage.setItem(
           'accessToken',
           response?.payload?.body?.access_token,
         );
-        navigation.navigate('About');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'About' }],
+        });
 
       setLoading(false);
     } catch (error) {
