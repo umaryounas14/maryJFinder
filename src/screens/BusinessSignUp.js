@@ -50,6 +50,7 @@ const BusinessSignUp = ({navigation}) => {
   const businessSignUpNow = async () => {
     try {
       setLoading(true);
+  
       const payload = {
         email: email,
         password: password,
@@ -61,30 +62,39 @@ const BusinessSignUp = ({navigation}) => {
         scope: '',
         account_type: 'business'
       };
+  
+      // Dispatch the signup action
       const response = await dispatch(businessSignUp(payload));
-      console.log(response?.payload?.body, 'message');
-      if (response?.payload?.body?.message) {
-        navigation.navigate('OtpVerify' , { email: email, password: password });
+      const responseBody = response?.payload?.body;
+  
+      // Check if the response is successful
+      if (responseBody?.message) {
+        // Navigate to OTP verification screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'OtpVerify', params: { email: email, password: password } }],
+        });
+      } else if (response?.error) {
+        // Handle the case where the email is already in use
+        Alert.alert('This email is already registered. Please use a different email.');
       }
-      else if (response?.payload?.body?.access_token)
-        await AsyncStorage.setItem(
-          'accessToken',
-          response?.payload?.body?.access_token,
-        );
-        navigation.navigate('AboutBusiness');
-      setLoading(false);
     } catch (error) {
+      // Log and handle unexpected errors
       console.error('Signup error:', error);
+      Alert.alert('An unexpected error occurred. Please try again.');
+    } finally {
+      // Ensure loading state is always reset
       setLoading(false);
     }
   };
+  
 
   return (
     <ScrollView>
       <Block flex middle>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      {/* <TouchableOpacity onPress={() => navigation.navigate('Selection')} style={styles.backButton}>
             <Icon name="arrowleft" size={24} color="#000" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
       <View style={{height: 150}}>
             <Image
               source={require('../assets/splash.png')}

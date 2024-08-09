@@ -20,26 +20,28 @@ const UpgradePlan = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrowleft" size={24} color="#000" />
-          </TouchableOpacity>
-          <View style = {{ height: 150}}>
-            <Image
-              source={require('../assets/splash.png')}
-              style={styles.image}
-            />
-          </View>
-          <Block middle style={{paddingVertical: theme.SIZES.BASE * 1.5}}>
-            <Text
-              style={{
-                fontSize: 30,
-                color: '#000000',
-                fontWeight: '500',
-                marginLeft: 10,
-              }}>
-              Upgrade Your Plan
-            </Text>
-          </Block>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}>
+          <Icon name="arrowleft" size={24} color="#000" />
+        </TouchableOpacity>
+        <View style={{height: 150}}>
+          <Image
+            source={require('../assets/splash.png')}
+            style={styles.image}
+          />
+        </View>
+        <Block middle style={{paddingVertical: theme.SIZES.BASE * 1.5}}>
+          <Text
+            style={{
+              fontSize: 30,
+              color: '#000000',
+              fontWeight: '500',
+              marginLeft: 10,
+            }}>
+            Upgrade Your Plan
+          </Text>
+        </Block>
       </Block>
       <View>
         <View
@@ -57,7 +59,7 @@ const UpgradePlan = ({navigation}) => {
             size="medium"
             shadowless
             color="#ddd"
-            style={{height: 48, width: 280, marginLeft:1}}
+            style={{height: 48, width: 280, marginLeft: 1}}
             onPress={() => navigation.navigate('UpgradePlan')}>
             Current Plan
           </Button>
@@ -223,7 +225,7 @@ const UpgradePlan = ({navigation}) => {
             shadowless
             color="#20B340"
             style={{height: 48}}
-            onPress={() => navigation.navigate('ChatScreen')}>
+            onPress={() => navigation.navigate('Login')}>
             Continue
           </Button>
         </Block>

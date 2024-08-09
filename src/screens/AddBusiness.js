@@ -268,7 +268,7 @@ const AddBusiness = ({navigation}) => {
                   shadowless
                   color="#20B340"
                   style={{height: 48}}
-                  onPress={() => navigation.navigate('ActivateStore')}>
+                  onPress={() => navigation.navigate('UpgradePlan')}>
                   Continue
                 </Button>
               </Block>

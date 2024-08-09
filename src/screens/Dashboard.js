@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -6,20 +6,54 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Image,
-  Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Block, Button, Input, theme } from 'galio-framework';
-import { useDispatch, useSelector } from 'react-redux';
-const { width } = Dimensions.get('window');
+import { Block, Button, theme } from 'galio-framework';
 import LineChartComponent from '../components/LineChart';
 import TableView from '../components/TableView';
+import DrawerSceneWrapper from '../components/drawerSceneWrapper';
+import Icon from 'react-native-vector-icons/Feather';
+import MultiLineChart from '../components/MultiLineChart';
+import { useDispatch, useSelector} from 'react-redux';
+import { getStores } from '../redux/slices/getStoresSlice';
+
+const { width } = Dimensions.get('window');
 
 const Dashboard = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [isVisible, setIsVisible] = useState(true);
-  const opacityAnimation = new Animated.Value(1);
+  const stores = useSelector((state) => state.stores); // Adjust based on your state structure
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('accessToken');
+
+      navigation.navigate('Login');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  const openDrawer = () => {
+    navigation.openDrawer();
+  };
+
+  const data = [
+    { month: 'Jan', impressions: 50, ctr: 10 },
+    { month: 'Feb', impressions: 10, ctr: 20 },
+    { month: 'Mar', impressions: 40, ctr: 40 },
+    { month: 'Apr', impressions: 150, ctr: 50 },
+    { month: 'May', impressions: -4, ctr: 60 },
+    { month: 'Jun', impressions: -24, ctr: 70 },
+    { month: 'Jul', impressions: 85, ctr: 50 },
+    { month: 'Aug', impressions: 91, ctr: 20 },
+    { month: 'Sep', impressions: 35, ctr: 30 },
+    { month: 'Oct', impressions: 53, ctr: 85 },
+    { month: 'Nov', impressions: -53, ctr: 30 },
+    { month: 'Dec', impressions: 24, ctr: 60 },
+  ];
 
   const words = [
     ['Search Subject', 'Product Category', 'Impressions', 'Map Clicks', 'Cart Clicks', 'Avg CTR', 'Inquiries'],
@@ -27,60 +61,36 @@ const Dashboard = ({ navigation }) => {
     ['blueberry pre-rolls', 'Pre-rolls', '5454', '4354', '342', '454', 'Where can I find pre-rolls...'],
     ['phat panda', 'Brand', '4343', '454', '454', '454', 'What’s the best brand...'],
     ['4 pack pre-rolls', 'Pre-rolls', '3943', '3445', '453', '454', 'Which store has....'],
-    ];
+  ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVisible((prev) => !prev);
-    }, 3000); // 20 seconds interval
+  const performanceData = [
+    ['Product', 'Impressions', 'Sales', 'Clicks', 'Conversion Rate'],
+    ['sleepy edibles', '1200', '1200', '300', '25%'],
+    ['blueberry pre-rolls', '200', '900', '500', '55%'],
+    ['phat panda', '590', '800', '450', '56%'],
+  ];
 
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (!isVisible) {
-      Animated.timing(opacityAnimation, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      Animated.timing(opacityAnimation, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [isVisible]);
-
-  const handleLogout = async () => {
-    try {
-      // Remove the access token from AsyncStorage
-      await AsyncStorage.removeItem('accessToken');
-      // Navigate to the login screen
-      navigation.navigate('ChatScreen');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'ChatScreen' }],
-      });
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
-  const navigateToChatScreen = () => {
-    navigation.navigate('ChatScreen');
-  };
+  const topQuries = [
+    ['Query', 'Frequency', 'Avg.CTR', 'Conversion Rate'],
+    ['Edibles that help sleep', '30', '10%', '4%'],
+    ['THC vape pen', '20', '20%', , '6%'],
+    ['phat panda', '50', '15%', '5%'],
+    ['CBD oil for anxity', '50', '8%', '5%'],
+  ];
 
   return (
+    <DrawerSceneWrapper>
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.announcementBanner}>
+        <TouchableOpacity onPress={() => navigation.navigate('ActivateStore')} style={styles.announcementBanner}>
           <Text style={styles.announcementText}>Activate Your Store!</Text>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={openDrawer}>
+          <Icon name="menu" size={30} style={{marginLeft: 10, marginTop: 10}} />
+        </TouchableOpacity>
         <Block flex middle style={styles.userInfoContainer}>
           <Text style={styles.userInfoText}>Hello, John Smith</Text>
-          {/* <Text style={styles.notificationCountText}>You have <Text style={{ color: '#2594E5' }}>3 new notifications</Text></Text> */}
+          <Text style={styles.notificationCountText}>You have <Text style={{ color: '#2594E5' }}>3 new notifications</Text></Text>
           <View style={styles.blocksContainer}>
             <View style={styles.block}>
               <Text style={styles.blockTitle}>Impressions</Text>
@@ -90,7 +100,7 @@ const Dashboard = ({ navigation }) => {
             <View style={styles.block}>
               <Text style={styles.blockTitle}>CTR</Text>
               <Text style={styles.blockValue}>1.5K</Text>
-              <Text style={styles.blockAction}>View Data</Text>
+              <Text style={styles.blockAction}>View Data</Text> 
             </View>
           </View>
           <View style={styles.blocksContainer}>
@@ -105,9 +115,17 @@ const Dashboard = ({ navigation }) => {
               <Text style={styles.blockAction}>View Products</Text>
             </View>
           </View>
-          {/* <View style={styles.lineChartContainer}>
-            <LineChartComponent />
-          </View> */}
+          <View style={styles.lineChartContainer}>
+            <MultiLineChart />
+          </View>
+          <View style={styles.performanceTableContainer}>
+            <Text style={styles.tableViewTitle}>Performance Comparison by Product</Text>
+            <TableView data={performanceData} />
+          </View>
+          <View style={styles.performanceTableContainer}>
+            <Text style={styles.tableViewTitle}>Top Quries</Text>
+            <TableView data={topQuries} />
+          </View>
           <View style={styles.tableViewContainer}>
             <Text style={styles.tableViewTitle}>User Inquiries</Text>
             <TableView data={words} />
@@ -118,20 +136,9 @@ const Dashboard = ({ navigation }) => {
             Logout
           </Button>
         </Block>
-        {/* Chat bot icon */}
-        <Animated.View style={[styles.chatIconContainer, { opacity: opacityAnimation }]}>
-          {isVisible && (
-            <TouchableOpacity style={styles.chatIconTouchable} onPress={navigateToChatScreen}>
-              <Image
-                source={require('../assets/splash.png')} 
-                style={styles.chatIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          )}
-        </Animated.View>
       </ScrollView>
     </View>
+    </DrawerSceneWrapper>
   );
 };
 
@@ -158,7 +165,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   userInfoContainer: {
-    marginTop: 20,
+    marginTop: 5,
     alignItems: 'center',
   },
   userInfoText: {
@@ -211,8 +218,13 @@ const styles = StyleSheet.create({
   tableViewContainer: {
     width: '100%',
     marginBottom: 20,
-    position: 'relative',
-    zIndex: 0,
+    paddingHorizontal: 5,
+  },
+  performanceTableContainer: {
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 5,
+    flex: 1
   },
   tableViewTitle: {
     fontSize: 20,
@@ -224,34 +236,9 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     backgroundColor: '#FF4500',
-    width: '90%',
+    width: '70%',
     alignSelf: 'center',
     marginBottom: 20,
-  },
-  chatIconContainer: {
-    position: 'absolute',
-    top: 650, 
-    right: 30, 
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-    zIndex: 1,
-  },
-  chatIconTouchable: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chatIcon: {
-    width: 90,
-    height: 90,
-    marginLeft: 15, 
-    marginTop: 15
   },
 });
 

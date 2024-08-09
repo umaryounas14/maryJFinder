@@ -9,7 +9,7 @@ import { ThemeProvider , useTheme, lightTheme, darkTheme} from '../context/theme
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = ({
-  navigation,
+ 
   isLoggedIn,
   handleLogout,
   conversations,
@@ -123,7 +123,7 @@ const ChatDrawer = ({ navigation }) => {
   const [conversations, setConversations] = useState([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const currentPageRef = useRef(1); // Ref for currentPage
+  const currentPageRef = useRef(1); 
   const totalPages = 22; // Example, should be fetched from API
 
   const fetchConversations = useCallback(async () => {

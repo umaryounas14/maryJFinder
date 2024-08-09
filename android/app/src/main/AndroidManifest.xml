@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package ="com.maryjfinder">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package ="com.maryjfinder.business">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
               <data
         android:path="/WnC5CvtgsHyvmEjcetAuTTR0dCs="
-        android:host="com.maryjfinder"
+        android:host="com.maryjfinder.business"
         android:scheme="msauth" />
             </intent-filter>
       </activity>

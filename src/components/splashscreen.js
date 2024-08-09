@@ -8,7 +8,7 @@ const SplashScreen = ({ navigation }) => {
             try {
                 const accessToken = await AsyncStorage.getItem('accessToken');
                 if (accessToken) {
-                    navigation.replace('ChatScreen');
+                    navigation.replace('Dashboard');
                 } else {
                     navigation.replace('Selection');
                 }

@@ -3358,17 +3358,19 @@ __metadata:
     prettier: 2.8.8
     react: ^18.3.1
     react-native: 0.74.1
+    react-native-animatable: ^1.4.0
     react-native-app-auth: ^7.2.0
     react-native-azure-auth: ^1.8.11
+    react-native-chart-kit: ^6.12.0
     react-native-date-picker: ^5.0.4
     react-native-element-dropdown: ^2.12.0
     react-native-event-source: ^1.1.0
     react-native-gesture-handler: ^2.16.2
-    react-native-gifted-charts: ^1.4.10
     react-native-linear-gradient: ^2.8.3
     react-native-markdown-display: ^7.0.2
-    react-native-paper: ^5.12.3
+    react-native-paper: ^5.12.5
     react-native-reanimated: ^3.11.0
+    react-native-reanimated-carousel: ^3.5.1
     react-native-safe-area-context: ^4.10.1
     react-native-screens: ^3.31.1
     react-native-splash-screen: ^3.3.0
@@ -6012,16 +6014,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gifted-charts-core@npm:^0.1.4":
-  version: 0.1.4
-  resolution: "gifted-charts-core@npm:0.1.4"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 2d98a901ef73124b496000f39d693cbf4c927b41f67c56bae6e7af76b80580d4860bc48493759df90f661b30e3295a0a6a6c2d524749115138de6066db7db4fe
-  languageName: node
-  linkType: hard
-
 "glob-parent@npm:^5.1.2":
   version: 5.1.2
   resolution: "glob-parent@npm:5.1.2"
@@ -7701,7 +7693,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.15, lodash@npm:^4.17.21":
+"lodash@npm:^4.17.13, lodash@npm:^4.17.15, lodash@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -8869,6 +8861,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"paths-js@npm:^0.4.10":
+  version: 0.4.11
+  resolution: "paths-js@npm:0.4.11"
+  checksum: a2e968450d4c02a3aed2866c28766e6d386afd9a4ed5f8fe9c4f87e6867ef57d94d0e7a184f8987dfa7c59fed2519e10052320505b5bd1fd7a28dea7bb94995d
+  languageName: node
+  linkType: hard
+
 "performance-now@npm:^2.1.0":
   version: 2.1.0
   resolution: "performance-now@npm:2.1.0"
@@ -8930,6 +8929,13 @@ __metadata:
     base64-js: ^1.5.1
     xmlbuilder: ^15.1.1
   checksum: c8ea013da8646d4c50dff82f9be39488054621cc229957621bb00add42b5d4ce3657cf58d4b10c50f7dea1a81118f825838f838baeb4e6f17fab453ecf91d424
+  languageName: node
+  linkType: hard
+
+"point-in-polygon@npm:^1.0.1":
+  version: 1.1.0
+  resolution: "point-in-polygon@npm:1.1.0"
+  checksum: 67a6374f0b79bc872bde8e375d7d5ea011a1419c5f4320dfb7705801cd3a8fcaee8bff385465e075b2ce863bbc86ccd74c63345d9f326981cd0807642bc5199c
   languageName: node
   linkType: hard
 
@@ -9219,6 +9225,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-animatable@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "react-native-animatable@npm:1.4.0"
+  dependencies:
+    prop-types: ^15.8.1
+  checksum: a1b211aff745b97351d78643d641fa298f7d71524eaf22fee8a69257ce52e85d6b3caf8e7fd26a521af34984fba7402b7c632c35ea69d618769387d1dcb6b32a
+  languageName: node
+  linkType: hard
+
 "react-native-app-auth@npm:^7.2.0":
   version: 7.2.0
   resolution: "react-native-app-auth@npm:7.2.0"
@@ -9251,6 +9266,21 @@ __metadata:
   version: 0.0.2
   resolution: "react-native-base64@npm:0.0.2"
   checksum: 696f6cad0e3ce26437275bcd791becaf597300d351a3ab2d7084fd42a177731bb9ab1e490534397ed35de4cd2a5a4385ee8d49bf5846069101b5ada98f132d23
+  languageName: node
+  linkType: hard
+
+"react-native-chart-kit@npm:^6.12.0":
+  version: 6.12.0
+  resolution: "react-native-chart-kit@npm:6.12.0"
+  dependencies:
+    lodash: ^4.17.13
+    paths-js: ^0.4.10
+    point-in-polygon: ^1.0.1
+  peerDependencies:
+    react: "> 16.7.0"
+    react-native: ">= 0.50.0"
+    react-native-svg: "> 6.4.1"
+  checksum: 04c225965c0ce3c71205a62bc92743e9188458d8f95c12481e43a2e53c425bd5db8274e57ab93c1cb95ffd3fb54950ca92c3d33e518a3505d7697c247b3b7e15
   languageName: node
   linkType: hard
 
@@ -9308,26 +9338,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gifted-charts@npm:^1.4.10":
-  version: 1.4.10
-  resolution: "react-native-gifted-charts@npm:1.4.10"
-  dependencies:
-    gifted-charts-core: ^0.1.4
-  peerDependencies:
-    expo-linear-gradient: "*"
-    react: "*"
-    react-native: "*"
-    react-native-linear-gradient: "*"
-    react-native-svg: "*"
-  peerDependenciesMeta:
-    expo-linear-gradient:
-      optional: true
-    react-native-linear-gradient:
-      optional: true
-  checksum: 0b474460a362c6e6359912f2dbb319d94b598e7b95ce9eaf26110da79eb13122b86cbaa753c7e0bb1381b43fce7e9e36fb0e4186ae19b53f3493efaa108cbebc
-  languageName: node
-  linkType: hard
-
 "react-native-linear-gradient@npm:^2.8.3":
   version: 2.8.3
   resolution: "react-native-linear-gradient@npm:2.8.3"
@@ -9353,9 +9363,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-paper@npm:^5.12.3":
-  version: 5.12.3
-  resolution: "react-native-paper@npm:5.12.3"
+"react-native-paper@npm:^5.12.5":
+  version: 5.12.5
+  resolution: "react-native-paper@npm:5.12.5"
   dependencies:
     "@callstack/react-theme-provider": ^3.0.9
     color: ^3.1.2
@@ -9365,7 +9375,7 @@ __metadata:
     react-native: "*"
     react-native-safe-area-context: "*"
     react-native-vector-icons: "*"
-  checksum: 927a8948d220fb59cb4dae2f12f3b4dc2173b9cd42e38dc74a0f25584a69978555a260c140db973f8401f7fef394dee3ec42c90b6134deeb3aa462291fd0ce5f
+  checksum: 35ce56e0bb19c46ce85adc47a504527b7ec455d1a15f3ace0d6fd438abd51b1fe30e1b44351950e16d6376ddbc18ecc94b558e267767d0a9fd886a5f66a4c322
   languageName: node
   linkType: hard
 
@@ -9378,6 +9388,18 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 34aa4e7ff09e537d5c8fb5b5bc98470c0723d7c0fff8954e39de371cdfa5ae3aa4af636ea44d508751f5dcaca6f80ee363fffd9c34a1bd8d8f7a9d8a23d82d15
+  languageName: node
+  linkType: hard
+
+"react-native-reanimated-carousel@npm:^3.5.1":
+  version: 3.5.1
+  resolution: "react-native-reanimated-carousel@npm:3.5.1"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-native: ">=0.6.0"
+    react-native-gesture-handler: ">=2.0.0"
+    react-native-reanimated: ">=3.0.0"
+  checksum: a2eb640453fa35f659c1fb5575f903364d513fb7f621104afa14fee2284132674dfaf0d87cb29e8c119f7513094a5967d5193f3dfa24043af167c6f26abcfe73
   languageName: node
   linkType: hard
 
