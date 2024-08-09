@@ -1,6 +1,6 @@
 // ChatScreen.js
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -11,13 +11,14 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Linking,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Markdown from 'react-native-markdown-display';
-import { useSelector, useDispatch } from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import {
   setLoading,
   setError,
@@ -32,13 +33,13 @@ import TypeWriter from 'react-native-typewriter';
 import AnimatedDots from '../components/AnimatedDots';
 import aiAvatar from '../assets/mar-j-icon.png';
 import centerImage from '../assets/test.png';
-import { useTheme, lightTheme, darkTheme } from '../context/themeContext';
+import {useTheme, lightTheme, darkTheme} from '../context/themeContext';
 
 const BASE_URL = 'https://maryjfinder.com/api/chatbot/chat';
 
-const ChatScreen = ({ route }) => {
-  const { theme, toggleTheme, isDarkTheme } = useTheme();
-  const { threadId, accessToken } = route.params || {
+const ChatScreen = ({route}) => {
+  const {theme, toggleTheme, isDarkTheme} = useTheme();
+  const {threadId, accessToken} = route.params || {
     threadId: null,
     accessToken: null,
   };
@@ -50,16 +51,14 @@ const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const messages = useSelector((state) =>
-    selectMessagesForThread(state, threadId)
+  const messages = useSelector(state =>
+    selectMessagesForThread(state, threadId),
   );
-  const { created_at_cur_msg, isAiTyping } = useSelector(
-    (state) => state.chat
-  );
+  const {created_at_cur_msg, isAiTyping} = useSelector(state => state.chat);
 
   useEffect(() => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+      scrollViewRef.current.scrollToEnd({animated: true});
     }
   }, [messages]);
 
@@ -76,16 +75,16 @@ const ChatScreen = ({ route }) => {
 
         const response = await axios.get(
           `https://maryjfinder.com/api/chatbot/messages/${threadId}`,
-          { headers }
+          {headers},
         );
 
         if (response.data.status_code === 200) {
           const fetchedMessages = response.data.body.response || [];
           const processedMessages = processMessages(fetchedMessages);
-          dispatch(setMessages({ threadId, messages: processedMessages }));
+          dispatch(setMessages({threadId, messages: processedMessages}));
           await AsyncStorage.setItem(
             `currentChatMessages_${threadId}`,
-            JSON.stringify(processedMessages)
+            JSON.stringify(processedMessages),
           );
         } else {
           console.error('Failed to fetch messages:', response.data);
@@ -104,7 +103,7 @@ const ChatScreen = ({ route }) => {
     }
   }, [dispatch, threadId]);
 
-  const sendMessage = (messageText) => {
+  const sendMessage = messageText => {
     if (!messageText.trim()) return;
 
     const userMessage = {
@@ -115,11 +114,11 @@ const ChatScreen = ({ route }) => {
     setInputText('');
 
     dispatch(setCompleteMessageClear());
-    dispatch(sendMessageSuccess({ threadId, message: userMessage }));
+    dispatch(sendMessageSuccess({threadId, message: userMessage}));
     dispatch(setIsAiTyping(true));
 
     AsyncStorage.getItem('accessToken')
-      .then((accessToken) => {
+      .then(accessToken => {
         const url = `${BASE_URL}?message=${encodeURIComponent(messageText)}`;
         const params = {};
 
@@ -136,23 +135,23 @@ const ChatScreen = ({ route }) => {
           adapter: 'fetch',
         });
       })
-      .then((response) => {
+      .then(response => {
         handleEventStream(response.data);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Error sending message:', error);
         dispatch(setError(error.message));
       });
   };
 
-  const handleEventStream = (eventStream) => {
+  const handleEventStream = eventStream => {
     const lines = eventStream.split('\n\n');
     let accumulatedText = '';
     let threadId = null;
     const created_at = new Date().toISOString();
     dispatch(setCreatedAt(created_at));
 
-    lines.forEach((line) => {
+    lines.forEach(line => {
       const event = parseEvent(line);
       if (event && event.type === 'thread.message.delta') {
         try {
@@ -162,7 +161,7 @@ const ChatScreen = ({ route }) => {
             accumulatedText.trim(),
             false,
             created_at,
-            threadId
+            threadId,
           );
         } catch (e) {
           console.error('Error parsing delta event data:', e);
@@ -181,11 +180,7 @@ const ChatScreen = ({ route }) => {
     dispatch(setIsAiTyping(false));
   };
 
-  const sendCompleteMessage = (
-    messageContent,
-    isMsgComplete,
-    created_at
-  ) => {
+  const sendCompleteMessage = (messageContent, isMsgComplete, created_at) => {
     if (messageContent.trim()) {
       const completeMessage = {
         role: 'ai',
@@ -197,15 +192,15 @@ const ChatScreen = ({ route }) => {
           threadId,
           message: completeMessage,
           isMsgComplete,
-        })
+        }),
       );
     }
   };
 
-  const parseEvent = (input) => {
-    const event = { type: '', data: '' };
+  const parseEvent = input => {
+    const event = {type: '', data: ''};
     const lines = input.split('\n');
-    lines.forEach((line) => {
+    lines.forEach(line => {
       const index = line.indexOf(': ');
       if (index > 0) {
         const field = line.substring(0, index);
@@ -223,7 +218,7 @@ const ChatScreen = ({ route }) => {
     return event;
   };
 
-  const formatMessageTime = (createdAt) => {
+  const formatMessageTime = createdAt => {
     const date = new Date(createdAt);
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -251,16 +246,16 @@ const ChatScreen = ({ route }) => {
           onPress: async () => {
             dispatch(setLoading());
             await AsyncStorage.removeItem(`currentChatMessages_${threadId}`);
-            dispatch(setMessages({ threadId: null, messages: [] }));
+            dispatch(setMessages({threadId: null, messages: []}));
             navigation.navigate('ChatScreen');
           },
         },
       ],
-      { cancelable: true }
+      {cancelable: true},
     );
   };
 
-  const processMessages = (fetchedMessages) => {
+  const processMessages = fetchedMessages => {
     const processedMessages = [];
 
     fetchedMessages.forEach((message, index) => {
@@ -282,25 +277,48 @@ const ChatScreen = ({ route }) => {
     return processedMessages;
   };
 
+  const handleLinkPress = url => {
+    // Check if the URL is a product URL
+    const productIdMatch = url.match(/\/product\/(\d+)/);
+    if (productIdMatch) {
+      const productId = productIdMatch[1];
+      // Navigate to the ProductScreen with the productId
+      navigation.navigate('ProductScreen', {productId});
+    } else {
+      // Handle other URLs or open in default browser
+      Linking.openURL(url);
+    }
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View
+      style={[styles.container, {backgroundColor: theme.colors.background}]}>
       <View style={styles.banner}>
         <TouchableOpacity onPress={openDrawer}>
-          <Icon name="menu" size={28} style={[styles.drawerIcon, { color: theme.colors.primary }]} />
+          <Icon
+            name="menu"
+            size={28}
+            style={[styles.drawerIcon, {color: theme.colors.primary}]}
+          />
         </TouchableOpacity>
-        <Text style={[styles.bannerText, { color: theme.colors.primary }]}>MaryJfinder Chat</Text>
+        <Text style={[styles.bannerText, {color: theme.colors.primary}]}>
+          MaryJfinder Chat
+        </Text>
         <TouchableOpacity onPress={startNewChat}>
-          <Icon name="edit" size={25} style={[styles.plusIcon, { color: theme.colors.primary }]} />
+          <Icon
+            name="edit"
+            size={25}
+            style={[styles.plusIcon, {color: theme.colors.primary}]}
+          />
         </TouchableOpacity>
       </View>
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={styles.messagesContainer}
         onContentSizeChange={() =>
-          scrollViewRef.current.scrollToEnd({ animated: true })
+          scrollViewRef.current.scrollToEnd({animated: true})
         }
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         {isLoadingMessages ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color={theme.colors.primary} />
@@ -315,12 +333,17 @@ const ChatScreen = ({ route }) => {
                   message?.role === 'user'
                     ? styles.userMessageContainer
                     : styles.aiMessageContainer,
-                ]}
-              >
+                ]}>
                 <View style={styles.messageContent}>
                   {message?.role === 'user' ? (
                     <>
-                      <Text style={[styles.messageText, { color: theme.colors.text }]}>{message.text}</Text>
+                      <Text
+                        style={[
+                          styles.messageText,
+                          {color: theme.colors.text},
+                        ]}>
+                        {message.text}
+                      </Text>
                       <Icon
                         name="user"
                         size={25}
@@ -331,17 +354,25 @@ const ChatScreen = ({ route }) => {
                   ) : (
                     <>
                       {created_at_cur_msg == message?.created_at ? (
-                        <TypeWriter minDelay={50} typing={2} style={{ color: theme.colors.text }}>
+                        <TypeWriter
+                          minDelay={50}
+                          typing={2}
+                          style={{color: theme.colors.text}}>
                           {message?.text}
                         </TypeWriter>
                       ) : (
-                        <Markdown style={{ color: theme.colors.text }}>{message?.text}</Markdown>
+                        <Markdown
+                          style={{color: theme.colors.text}}
+                          onLinkPress={handleLinkPress} // Handle link press
+                        >
+                          {message?.text}
+                        </Markdown>
                       )}
                       <Image source={aiAvatar} style={styles.messageImage} />
                     </>
                   )}
                 </View>
-                <Text style={[styles.messageTime, { color: theme.colors.text }]}>
+                <Text style={[styles.messageTime, {color: theme.colors.text}]}>
                   {formatMessageTime(message?.created_at)}
                 </Text>
               </View>
@@ -363,48 +394,78 @@ const ChatScreen = ({ route }) => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.recommendationContainer}
-        >
+          contentContainerStyle={styles.recommendationContainer}>
           {/* Render four separate recommendation blocks */}
           <TouchableOpacity
-            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            style={[
+              styles.recommendationBlock,
+              {backgroundColor: theme.colors.secondary},
+            ]}
             onPress={() => {
               sendMessage('What product do you recommend for anxiety?');
-            }}
-          >
-            <Text style={{ marginBottom: 20, fontSize: 14, marginLeft: 5, color: theme.colors.text }}>
+            }}>
+            <Text
+              style={{
+                marginBottom: 20,
+                fontSize: 14,
+                marginLeft: 5,
+                color: theme.colors.text,
+              }}>
               What product do you recommend for anxiety?
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            style={[
+              styles.recommendationBlock,
+              {backgroundColor: theme.colors.secondary},
+            ]}
             onPress={() =>
               sendMessage(
-                'Where is the closest dispensary near to my location?'
+                'Where is the closest dispensary near to my location?',
               )
-            }
-          >
-            <Text style={{ marginBottom: 20, fontSize: 14, marginLeft: 5, color: theme.colors.text }}>
+            }>
+            <Text
+              style={{
+                marginBottom: 20,
+                fontSize: 14,
+                marginLeft: 5,
+                color: theme.colors.text,
+              }}>
               Where is the closest dispensary near to my location?
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            style={[
+              styles.recommendationBlock,
+              {backgroundColor: theme.colors.secondary},
+            ]}
             onPress={() =>
               sendMessage('What products are available for pain relief?')
-            }
-          >
-            <Text style={{ marginBottom: 20, fontSize: 14, marginLeft: 5, color: theme.colors.text }}>
+            }>
+            <Text
+              style={{
+                marginBottom: 20,
+                fontSize: 14,
+                marginLeft: 5,
+                color: theme.colors.text,
+              }}>
               What products are available for pain relief?
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.recommendationBlock, { backgroundColor: theme.colors.secondary }]}
+            style={[
+              styles.recommendationBlock,
+              {backgroundColor: theme.colors.secondary},
+            ]}
             onPress={() =>
               sendMessage('Can you recommend a dispensary near me?')
-            }
-          >
-            <Text style={{ marginBottom: 20, fontSize: 14, color: theme.colors.text }}>
+            }>
+            <Text
+              style={{
+                marginBottom: 20,
+                fontSize: 14,
+                color: theme.colors.text,
+              }}>
               Can you recommend a dispensary near me?
             </Text>
           </TouchableOpacity>
@@ -412,7 +473,10 @@ const ChatScreen = ({ route }) => {
       )}
       <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.textInput, { backgroundColor: theme.colors.secondary, color: theme.colors.text }]}
+          style={[
+            styles.textInput,
+            {backgroundColor: theme.colors.secondary, color: theme.colors.text},
+          ]}
           placeholder="Type your message..."
           placeholderTextColor={theme.colors.text}
           value={inputText}
@@ -422,10 +486,9 @@ const ChatScreen = ({ route }) => {
           editable={!isLoadingSend}
         />
         <TouchableOpacity
-          style={[styles.sendButton, { backgroundColor: "black",}, ]}
+          style={[styles.sendButton, {backgroundColor: 'black'}]}
           onPress={() => sendMessage(inputText)}
-          disabled={isLoadingSend}
-        >
+          disabled={isLoadingSend}>
           {isLoadingSend ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
@@ -477,7 +540,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     width: '100%',
     marginLeft: 10,
-    backgroundColor: lightTheme.colors.primary
+    backgroundColor: lightTheme.colors.secondary,
   },
   messageContent: {
     position: 'relative',

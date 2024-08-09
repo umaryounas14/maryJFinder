@@ -174,28 +174,31 @@ const Login = ({navigation}) => {
 
     try {
       const response = await dispatch(loginUser(payload));
-
       if (response?.payload?.body?.access_token) {
-        const { access_token, refresh_token, expires_in, user } = response.payload.body;        
+        const {access_token, refresh_token, expires_in, user} =
+          response.payload.body;
         await storeTokensAndUserData(
           access_token,
           refresh_token,
           expires_in,
-          user
+          user,
         );
-
-        console.log('Login Successful!');
-        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token  });
+        const accountType = response.payload.body.user.account_type;
+        navigation.navigate('ChatScreen', {
+          accessToken: response?.payload?.body?.access_token && accountType
+        });
         navigation.reset({
           index: 0,
-          routes: [{ name: 'ChatScreen' }],
+          routes: [{name: 'ChatScreen'}],
         });
-      } else {
-        throw new Error('Login failed');
+      } else if(response.error.message){
+        Alert.alert(response.error.message);
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      Alert.alert('An error occurred while logging in. Please try again later.');
+      Alert.alert(
+        'An error occurred while logging in. Please try again later.',
+      );
     } finally {
       setLoading(false);
     }

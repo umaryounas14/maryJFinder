@@ -123,7 +123,7 @@ const ChatDrawer = ({ navigation }) => {
   const [conversations, setConversations] = useState([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const currentPageRef = useRef(1); // Ref for currentPage
+  const currentPageRef = useRef(1); 
   const totalPages = 22; // Example, should be fetched from API
 
   const fetchConversations = useCallback(async () => {
@@ -158,17 +158,22 @@ const ChatDrawer = ({ navigation }) => {
   }, [fetchConversations]);
 
   const handleLogout = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem('accessToken');
-      setIsLoggedIn(false);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Selection' }],
-      });
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  }, [navigation]);
+    navigation.navigate('ProductScreen')
+  });
+
+
+  // const handleLogout = useCallback(async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('accessToken');
+  //     setIsLoggedIn(false);
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: 'Selection' }],
+  //     });
+  //   } catch (error) {
+  //     console.error('Error logging out:', error);
+  //   }
+  // }, [navigation]);
 
   const fetchMoreConversations = useCallback(async () => {
     try {

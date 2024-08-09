@@ -35,6 +35,7 @@ import OtpVerify from './src/screens/OtpVerify';
 import ChatScreen from './src/screens/ChatScreen';
 import ChatDrawer from './src/routes/ChatDrawer';
 import { ThemeProvider } from './src/context/themeContext';
+import ProductScreen from './src/screens/ProductScreen';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -162,6 +163,7 @@ const App = () => {
             <Stack.Screen name="ActivateStore" component={ActivateStore} />
             <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} />
             <Stack.Screen name="OtpVerify" component={OtpVerify} />
+            <Stack.Screen name="ProductScreen" component={ProductScreen} />
             <Stack.Screen name="ChatScreen" component={ChatDrawer} />
           </Stack.Navigator>
         </NavigationContainer>
