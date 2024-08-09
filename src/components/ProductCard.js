@@ -1,137 +1,148 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
-import { Button, Card, Title, Paragraph } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import from react-native-vector-icons
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-const ProductCard = ({ product, onPress }) => {
-  const renderCarouselItem = ({ index }) => (
-    <Image source={{ uri: product.images[index] }} style={styles.carouselImage} />
-  );
-
-  // Function to render star icons based on rating
-  const renderRating = (rating) => {
-    const filledStars = Math.floor(rating);
-    const halfStar = rating % 1 !== 0;
-    const emptyStars = 5 - Math.ceil(rating);
-    return (
-      <View style={styles.ratingContainer}>
-        {[...Array(filledStars)].map((_, index) => (
-          <Icon key={`filled-${index}`} name="star" size={15} color="#FFD700" />
-        ))}
-        {halfStar && <Icon name="star-half" size={15} color="#FFD700" />}
-        {[...Array(emptyStars)].map((_, index) => (
-          <Icon key={`empty-${index}`} name="star-border" size={15} color="#FFD700" />
-        ))}
-      </View>
-    );
-  };
-
+const ProductCard = ({ product }) => {
   return (
-    <Card style={styles.card}>
-      <Carousel
-        loop
-        width={width}
-        height={200}
-        autoPlay={true}
-        data={product.images}
-        renderItem={renderCarouselItem}
-        scrollAnimationDuration={1000}
-      />
+    <View style={styles.card}>
+      {/* Product Image */}
+      <Image source={{ uri: product.body.image }} style={styles.image} />
 
-      <Card.Content style={styles.info}>
-        <Title style={styles.name}>{product.name}</Title>
-        <Text style={styles.price}>${product.price}</Text>
-        <Paragraph style={styles.description}>{product.description}</Paragraph>
+      {/* Product Info */}
+      <View style={styles.infoContainer}>
+        {/* Product Title */}
+        <Text style={styles.title}>{product.body.title}</Text>
 
-        {/* Reviews */}
-        <View style={styles.reviews}>
-          <Text style={styles.reviewsTitle}>Reviews:</Text>
+        {/* Rating */}
+        <View style={styles.ratingContainer}>
+          <Text style={styles.rating}>★★★★☆</Text>
+          <Text style={styles.reviewCount}>({product.body.review_count} reviews)</Text>
         </View>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
-            onPress={() => onPress(product)}
-            style={styles.addToCartButton}
-          >
-            Add to Cart
-          </Button>
-          <Button
-            mode="contained"
-            onPress={() => onPress(product)}
-            style={styles.viewDetailsButton}
-          >
-            View Details
-          </Button>
+        {/* Price and Stock */}
+        <View style={styles.priceStockContainer}>
+          <Text style={styles.price}>{product.body.sale_price_with_currency}</Text>
+          <Text style={styles.stock}>In Stock: {product.body.stock}</Text>
         </View>
-      </Card.Content>
-    </Card>
+
+        {/* Description */}
+        <Text style={styles.description}>{product.body.description}</Text>
+
+        {/* Product Details */}
+        <View style={styles.detailsContainer}>
+          <Detail label="Category" value={product.body.category_id} />
+          <Detail label="Brand" value={product.body.brand_id} />
+          <Detail label="Store" value={product.body.store.title} />
+        </View>
+      </View>
+
+      {/* Add to Cart Button */}
+      <TouchableOpacity style={styles.button} onPress={() => console.log('Add to Cart pressed')}>
+        <Text style={styles.buttonText}>Add to Cart</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
+// Helper component for product details
+const Detail = ({ label, value }) => (
+  <View style={styles.detailContainer}>
+    <Text style={styles.detailLabel}>{label}:</Text>
+    <Text style={styles.detailValue}>{value}</Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
   card: {
-    margin: 10,
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     overflow: 'hidden',
+    margin: 16,
+    elevation: 8, // More pronounced shadow
+    shadowColor: '#000', // Shadow for iOS
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
   },
-  carouselImage: {
-    width: width,
-    height: 200,
+  image: {
+    width: '100%',
+    height: 220,
     resizeMode: 'cover',
   },
-  info: {
-    padding: 15,
+  infoContainer: {
+    padding: 16,
   },
-  name: {
-    fontSize: 20,
+  title: {
+    fontSize: 22,
     fontWeight: 'bold',
-  },
-  price: {
-    fontSize: 18,
-    color: '#888',
-    marginVertical: 10,
-  },
-  description: {
-    fontSize: 16,
     color: '#333',
-    marginBottom: 10,
-  },
-  reviews: {
-    marginBottom: 15,
-  },
-  reviewsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  review: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
   ratingContainer: {
     flexDirection: 'row',
-    marginBottom: 5,
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  reviewText: {
+  rating: {
+    fontSize: 16,
+    color: '#FFD700', // Gold color for stars
+    marginRight: 8,
+  },
+  reviewCount: {
     fontSize: 14,
-    color: '#666',
+    color: '#888',
   },
-  buttonContainer: {
+  priceStockContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  addToCartButton: {
-    backgroundColor: '#28a745',
-    flex: 1,
-    marginRight: 5,
+  price: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#d9534f', // Red color for price
   },
-  viewDetailsButton: {
-    backgroundColor: '#007bff',
-    flex: 1,
-    marginLeft: 5,
+  stock: {
+    fontSize: 16,
+    color: '#5bc0de', // Light blue for stock status
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+    lineHeight: 22,
+  },
+  detailsContainer: {
+    marginBottom: 16,
+  },
+  detailContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#555',
+  },
+  detailValue: {
+    fontSize: 14,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#28a745', // Green color for button
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

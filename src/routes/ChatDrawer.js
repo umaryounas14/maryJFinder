@@ -158,17 +158,22 @@ const ChatDrawer = ({ navigation }) => {
   }, [fetchConversations]);
 
   const handleLogout = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem('accessToken');
-      setIsLoggedIn(false);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Selection' }],
-      });
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  }, [navigation]);
+    navigation.navigate('ProductScreen')
+  });
+
+
+  // const handleLogout = useCallback(async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('accessToken');
+  //     setIsLoggedIn(false);
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: 'Selection' }],
+  //     });
+  //   } catch (error) {
+  //     console.error('Error logging out:', error);
+  //   }
+  // }, [navigation]);
 
   const fetchMoreConversations = useCallback(async () => {
     try {

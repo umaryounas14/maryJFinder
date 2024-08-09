@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import {Button} from 'galio-framework';
 
@@ -35,7 +35,7 @@ const Selection = ({ navigation }) => {
           onPress={() => navigation.navigate('BusinessSignUp')}
         >
           Create Business Account
-        </Button>
+        </Button> 
         <Button
           size="medium"
           shadowless
@@ -69,6 +69,11 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     marginLeft: 50,
+  },
+  welcomeText: {
+    fontSize: 20,
+    marginBottom: 20,
+    fontWeight: 'bold'
   },
   buttonContainer: {
     alignItems: 'center',

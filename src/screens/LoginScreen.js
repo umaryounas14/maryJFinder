@@ -190,12 +190,12 @@ const Login = ({navigation}) => {
           user,
         );
         const accountType = response.payload.body.user.account_type;
-        navigation.navigate('Dashboard', {
+        navigation.navigate('ChatScreen', {
           accessToken: response?.payload?.body?.access_token && accountType
         });
         navigation.reset({
           index: 0,
-          routes: [{name: 'Dashboard'}],
+          routes: [{name: 'ChatScreen'}],
         });
       } else if(response.error.message){
         Alert.alert(response.error.message);

@@ -1,42 +1,86 @@
-import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+// ProductScreen.js
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProductCard from '../components/ProductCard'; // Ensure the path is correct
 
-const products = [
-  {
-    id: '1',
-    name: 'Product One',
-    price: '29.99',
-    images: [
-      'https://via.placeholder.com/200',
-      'https://via.placeholder.com/201',
-      'https://via.placeholder.com/202',
-    ],
-    description: 'This is a description of Product One.',
-    reviews: [
-      { rating: 4, comment: 'Great product!' },
-      { rating: 5, comment: 'Exceeded expectations.' },
-    ],
-  },
-  // Add more products as needed
-];
+const ProductScreen = ({ route }) => {
+  const { productId } = route.params; // Get the productId from route params
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const ProductScreen = ({ navigation }) => {
-  const handlePress = (product) => {
-    // Navigate to the ProductDetails screen, passing the product as a parameter
-    navigation.navigate('ProductDetails', { product });
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Retrieve the Bearer token from AsyncStorage
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+          throw new Error('No access token found');
+        }
+
+        // Fetch the product details from the API
+        const response = await fetch(`https://maryjfinder.com/api/product/${productId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Accept': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          // Handle non-2xx status codes
+          const errorText = await response.text();
+          throw new Error(`Error ${response.status}: ${errorText}`);
+        }
+
+        // Parse the JSON response
+        const data = await response.json();
+        setProduct(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  if (!product) {
+    return (
+      <View style={styles.center}>
+        <Text>No product found</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={products}
-        renderItem={({ item }) => (
-          <ProductCard product={item} onPress={handlePress} />
-        )}
-        keyExtractor={(item) => item.id}
-      />
-    </View>
+    <ScrollView style={styles.container}>
+      <ProductCard product={product} />
+    </ScrollView>
   );
 };
 
@@ -44,6 +88,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f4f4',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
