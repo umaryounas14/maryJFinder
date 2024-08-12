@@ -3,49 +3,33 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'rea
 
 const { width } = Dimensions.get('window');
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart }) => {
   return (
     <View style={styles.card}>
-      {/* Product Image */}
-      <Image source={{ uri: product.body.image }} style={styles.image} />
-
-      {/* Product Info */}
+      <Image source={{ uri: product.body?.image }} style={styles.image} />
       <View style={styles.infoContainer}>
-        {/* Product Title */}
-        <Text style={styles.title}>{product.body.title}</Text>
-
-        {/* Rating */}
+        <Text style={styles.title}>{product.body?.title}</Text>
         <View style={styles.ratingContainer}>
           <Text style={styles.rating}>★★★★☆</Text>
-          <Text style={styles.reviewCount}>({product.body.review_count} reviews)</Text>
+          <Text style={styles.reviewCount}>({product.body?.review_count} reviews)</Text>
         </View>
-
-        {/* Price and Stock */}
         <View style={styles.priceStockContainer}>
-          <Text style={styles.price}>{product.body.sale_price_with_currency}</Text>
-          <Text style={styles.stock}>In Stock: {product.body.stock}</Text>
+          <Text style={styles.price}>{product.body?.sale_price_with_currency}</Text>
         </View>
-
-        {/* Description */}
-        <Text style={styles.description}>{product.body.description}</Text>
-
-        {/* Product Details */}
+        <Text style={styles.description}>{product.body?.description}</Text>
         <View style={styles.detailsContainer}>
-          <Detail label="Category" value={product.body.category_id} />
-          <Detail label="Brand" value={product.body.brand_id} />
-          <Detail label="Store" value={product.body.store.title} />
+          <Detail label="Category" value={product.body?.category_id} />
+          <Detail label="Brand" value={product.body?.brand_id} />
+          <Detail label="Store" value={product.body?.store.title} />
         </View>
       </View>
-
-      {/* Add to Cart Button */}
-      <TouchableOpacity style={styles.button} onPress={() => console.log('Add to Cart pressed')}>
+      <TouchableOpacity style={styles.button} onPress={onAddToCart}>
         <Text style={styles.buttonText}>Add to Cart</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-// Helper component for product details
 const Detail = ({ label, value }) => (
   <View style={styles.detailContainer}>
     <Text style={styles.detailLabel}>{label}:</Text>
@@ -59,8 +43,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     margin: 16,
-    elevation: 8, // More pronounced shadow
-    shadowColor: '#000', // Shadow for iOS
+    elevation: 8,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -68,7 +52,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 220,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   infoContainer: {
     padding: 16,
@@ -86,7 +70,7 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 16,
-    color: '#FFD700', // Gold color for stars
+    color: '#FFD700',
     marginRight: 8,
   },
   reviewCount: {
@@ -102,11 +86,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#d9534f', // Red color for price
-  },
-  stock: {
-    fontSize: 16,
-    color: '#5bc0de', // Light blue for stock status
+    color: '#d9534f',
   },
   description: {
     fontSize: 14,
@@ -132,7 +112,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#28a745', // Green color for button
+    backgroundColor: '#28a745',
     paddingVertical: 12,
     borderRadius: 8,
     marginHorizontal: 16,

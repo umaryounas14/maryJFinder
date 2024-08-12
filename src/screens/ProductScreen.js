@@ -1,15 +1,18 @@
-// ProductScreen.js
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ProductCard from '../components/ProductCard'; // Ensure the path is correct
+import ProductCard from '../components/ProductCard';
+import MapComponent from '../components/MapView';
+import { useDispatch } from 'react-redux';
+import { trackAnalytics } from '../redux/slices/analyticsSlice';
+const { width } = Dimensions.get('window');
 
 const ProductScreen = ({ route }) => {
   const { productId } = route.params; // Get the productId from route params
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -32,14 +35,17 @@ const ProductScreen = ({ route }) => {
         });
 
         if (!response.ok) {
-          // Handle non-2xx status codes
           const errorText = await response.text();
           throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
-        // Parse the JSON response
         const data = await response.json();
         setProduct(data);
+
+        dispatch(trackAnalytics({
+          product_id: productId,
+          type: 'impression',
+        }));
       } catch (error) {
         setError(error.message);
       } finally {
@@ -50,7 +56,29 @@ const ProductScreen = ({ route }) => {
     if (productId) {
       fetchProduct();
     }
-  }, [productId]);
+  }, [productId, dispatch]);
+
+  const handleAddToCart = () => {
+    dispatch(trackAnalytics({
+      product_id: productId,
+      type: 'cart_click',
+    }));
+    // Add your add to cart logic here
+  };
+
+  const handleMapLoaded = () => {
+    dispatch(trackAnalytics({
+      product_id: productId,
+      type: 'map_click',
+    }));
+  };
+
+  const handleMarkerPress = () => {
+    dispatch(trackAnalytics({
+      product_id: productId,
+      type: 'map_click',
+    }));
+  };
 
   if (loading) {
     return (
@@ -77,9 +105,30 @@ const ProductScreen = ({ route }) => {
     );
   }
 
+  const latitude = parseFloat(product.body?.store?.latitude) || 37.7749;
+  const longitude = parseFloat(product.body?.store?.longitude) || -122.4194;
+  const storeTitle = product.body?.store?.title || 'Unknown Store';
+  const hasValidCoordinates = !isNaN(latitude) && !isNaN(longitude);
+
   return (
     <ScrollView style={styles.container}>
-      <ProductCard product={product} />
+      <ProductCard product={product} onAddToCart={handleAddToCart} />
+      <Text style={styles.storeTitle}>Store Location</Text>
+      {hasValidCoordinates ? (
+        <View style={styles.mapContainer}>
+          <MapComponent
+            latitude={latitude}
+            longitude={longitude}
+            title={storeTitle}
+            onMapLoaded={handleMapLoaded}
+            onMarkerPress={handleMarkerPress}
+          />
+        </View>
+      ) : (
+        <View style={styles.center}>
+          <Text>No map available for this product</Text>
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -93,6 +142,27 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  mapContainer: {
+    height: 300,
+    width: width - 40,
+    marginTop: 16,
+    marginHorizontal: 20,
+    borderRadius: 12,
+    overflow: 'hidden',
+    opacity: 0.9,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    marginBottom: 20,
+  },
+  storeTitle: {
+    marginLeft: 15,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
   },
 });
 

@@ -277,18 +277,18 @@ const ChatScreen = ({route}) => {
     return processedMessages;
   };
 
-  const handleLinkPress = url => {
-    // Check if the URL is a product URL
-    const productIdMatch = url.match(/\/product\/(\d+)/);
+  const handleLinkPress = (url) => {
+    // Define a regular expression to match product URLs and extract product ID
+    const productIdPattern = /\/product\/(\d+)$/;
+    const productIdMatch = url.match(productIdPattern);
     if (productIdMatch) {
       const productId = productIdMatch[1];
-      // Navigate to the ProductScreen with the productId
-      navigation.navigate('ProductScreen', {productId});
+        navigation.navigate('ProductScreen', { productId });
     } else {
-      // Handle other URLs or open in default browser
       Linking.openURL(url);
     }
   };
+  
 
   return (
     <View
