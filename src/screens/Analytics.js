@@ -12,12 +12,58 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Block, Button, Input, theme} from 'galio-framework';
 const {width, height} = Dimensions.get('window');
+import LineChartComponent from '../components/LineChart';
 import Heatmap from '../components/Heatmap';
 import TableView from '../components/TableView';
 import PredictiveAnalysisGraph from '../components/PredictiveAnalysisGraph';
-import MultiLineChart from '../components/MultiLineChart';
 
-const Intractions = ({navigation}) => {
+const data = [
+  {month: 'Jan', impressions: 10, ctr: 10},
+  {month: 'Feb', impressions: 20, ctr: 20},
+  {month: 'Mar', impressions: 30, ctr: 40},
+  {month: 'Dec', impressions: 40, ctr: 60},
+];
+const data2 = [
+    {month: 'Jan', impressions: 10, ctr: 10},
+    {month: 'Feb', impressions: 20, ctr: 20},
+    {month: 'Mar', impressions: 40, ctr: 40},
+    {month: 'Dec', impressions: 30, ctr: 60},
+  ];
+  const data3 = [
+    {month: 'Jan', impressions: 10, ctr: 10},
+    {month: 'Feb', impressions: 30, ctr: 20},
+    {month: 'Mar', impressions: 40, ctr: 40},
+    {month: 'Dec', impressions: 60, ctr: 60},
+  ];
+  const data4 = [
+    {month: 'Jan', impressions: 10, ctr: 10},
+    {month: 'Feb', impressions: 20, ctr: 20},
+    {month: 'Mar', impressions: 30, ctr: 40},
+    {month: 'Dec', impressions: 60, ctr: 60},
+  ];
+
+const performanceData = [
+  ['Product', 'Impressions', 'Sales', 'Clicks', 'Conversion Rate'],
+  ['sleepy edibles', '1200', '1200', '300', '25%'],
+  ['blueberry pre-rolls', '200', '900', '500', '55%'],
+  ['phat panda', '590', '800', '450', '56%'],
+];
+const topQuries = [
+  ['Query', 'Frequency', 'Avg.CTR', 'Conversion Rate'],
+  ['Edibles that help sleep', '30', '10%', '4%'],
+  ['THC vape pen', '20', '20%', , '6%'],
+  ['phat panda', '50', '15%', '5%'],
+  ['CBD oil for anxity', '50', '8%', '5%'],
+];
+
+const predictiveData = [
+  ['Month', 'Project Imprssions', 'Projected Clicks', 'Projected CTR'],
+  ['July', '18000', '2500', '10%'],
+  ['August', '20000', '3000', '20%'],
+  ['September', '22000', '3200', '15%'],
+];
+
+const Analytics = ({navigation}) => {
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -95,18 +141,87 @@ const Intractions = ({navigation}) => {
               />
               <Text style={styles.datePickerText}>End Date</Text>
             </View>
+            <View>
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontWeight: 'bold',
+                  color: 'black',
+                  marginRight: 10,
+                  marginTop: 10,
+                }}>
+                Overall Trends
+              </Text>
+            </View>
           </KeyboardAvoidingView>
         </Block>
+        <View
+          style={{
+            marginLeft: 25,
+            marginRight: 10,
+            width: '90%',
+          }}>
+          <LineChartComponent data={data} lineColor={'orange'} label={'Impressions over time (jan-dec)'} />
+        </View>
+        <View
+          style={{
+            marginLeft: 25,
+            marginRight: 10,
+            width: '90%',
+          }}>
+          <LineChartComponent data={data2} lineColor={'orange'} label={'Store clicks over time (jan-dec)'} />
+        </View>
+        <View
+          style={{
+            marginLeft: 25,
+            marginRight: 10,
+            width: '90%',
+          }}>
+          <LineChartComponent data={data3} lineColor={'green'} label={'Map clicks over time (jan-dec)'} />
+        </View>
+        <View
+          style={{
+            marginLeft: 25,
+            marginRight: 10,
+            width: '90%',
+          }}>
+          <LineChartComponent data={data4} lineColor={'blue'} label={'Products click over time (jan-dec)'} />
+        </View>
         <Block flex middle>
-            <View style={{marginHorizontal: 20, paddingVertical: 20}}>
-            <MultiLineChart/>
-            </View>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>
+              Performance Comparison by Product
+            </Text>
+            <TableView data={performanceData} />
+          </View>
         </Block>
+
         <Block flex middle>
-            <View style={{marginLeft: 15, marginRight: 20, paddingVertical: 10}}>
-            <Heatmap/>
-            </View>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>Top Queries</Text>
+            <TableView data={topQuries} />
+          </View>
         </Block>
+
+        <View style={{marginLeft: 15, marginRight: 20}}>
+          <Heatmap />
+        </View>
+
+        <Block flex middle>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>Predictive analysis</Text>
+            <TableView data={predictiveData} />
+          </View>
+        </Block>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: '#fff',
+            padding: 8,
+            marginLeft: 20,
+          }}>
+          <PredictiveAnalysisGraph />
+        </View>
       </ScrollView>
     </View>
   );
@@ -200,6 +315,15 @@ const styles = StyleSheet.create({
     top: '50%',
     marginTop: 5,
   },
+  searchContainer: {
+    backgroundColor: 'transparent',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    borderWidth: 1,
+    borderColor: '#B4B4B4',
+    borderRadius: 20,
+    marginTop: 1,
+  },
 });
 
-export default Intractions;
+export default Analytics;

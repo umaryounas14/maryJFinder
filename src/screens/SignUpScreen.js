@@ -80,9 +80,9 @@ const SignUpScreen = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Icon name="arrowleft" size={24} color="#000" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style = {{ height: 150}}>
             <Image
               source={require('../assets/splash.png')}

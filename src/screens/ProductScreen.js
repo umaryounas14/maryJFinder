@@ -6,26 +6,23 @@ import MapComponent from '../components/MapView';
 import { useDispatch } from 'react-redux';
 import { trackAnalytics } from '../redux/slices/analyticsSlice';
 const { width } = Dimensions.get('window');
-
 const ProductScreen = ({ route }) => {
   const { productId } = route.params; // Get the productId from route params
+  // const{productId}='1090909090';
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       setError(null);
-
       try {
         // Retrieve the Bearer token from AsyncStorage
         const accessToken = await AsyncStorage.getItem('accessToken');
         if (!accessToken) {
           throw new Error('No access token found');
         }
-
         // Fetch the product details from the API
         const response = await fetch(`https://maryjfinder.com/api/product/${productId}`, {
           headers: {
@@ -33,15 +30,12 @@ const ProductScreen = ({ route }) => {
             'Accept': 'application/json',
           },
         });
-
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Error ${response.status}: ${errorText}`);
         }
-
         const data = await response.json();
         setProduct(data);
-
         dispatch(trackAnalytics({
           product_id: productId,
           type: 'impression',
@@ -52,12 +46,10 @@ const ProductScreen = ({ route }) => {
         setLoading(false);
       }
     };
-
     if (productId) {
       fetchProduct();
     }
   }, [productId, dispatch]);
-
   const handleAddToCart = () => {
     dispatch(trackAnalytics({
       product_id: productId,
@@ -65,14 +57,12 @@ const ProductScreen = ({ route }) => {
     }));
     // Add your add to cart logic here
   };
-
   const handleMapLoaded = () => {
     dispatch(trackAnalytics({
       product_id: productId,
       type: 'map_click',
     }));
   };
-
   const handleMarkerPress = () => {
     dispatch(trackAnalytics({
       product_id: productId,
@@ -132,7 +122,6 @@ const ProductScreen = ({ route }) => {
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

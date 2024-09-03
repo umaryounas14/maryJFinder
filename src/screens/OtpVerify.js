@@ -41,12 +41,11 @@ const OtpVerify = ({route, navigation}) => {
 
       // If access_token is present and account_type is 'business', navigate to 'AboutBusiness'
       if (accessToken && accountType === 'business') {
-        navigation.navigate('AboutBusiness');
-      }
-      // If only access_token is present, navigate to 'About'
-      else if (accessToken) {
-        navigation.navigate('About');
-      }
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AboutBusiness' }],
+        });      }
+
 
       setLoading(false);
     } catch (error) {

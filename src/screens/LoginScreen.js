@@ -1,3 +1,4 @@
+
 import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
@@ -23,7 +24,7 @@ import {appleAuthAndroid} from '@invertase/react-native-apple-authentication';
 import {client_id, client_secret, web_client_id} from '../constants/configs';
 import {loginUser} from '../redux/slices/loginSlice';
 import {socialLoginGoogle} from '../redux/slices/googleLoginSlice';
-import { BASE_URL } from '../constants/endpoints';
+import {BASE_URL} from '../constants/endpoints';
 const {width} = Dimensions.get('window');
 
 const Login = ({navigation}) => {
@@ -36,7 +37,12 @@ const Login = ({navigation}) => {
     password: false,
   });
 
-  const storeTokensAndUserData = async (accessToken, refreshToken, expiresIn, user) => {
+  const storeTokensAndUserData = async (
+    accessToken,
+    refreshToken,
+    expiresIn,
+    user,
+  ) => {
     try {
       const expiryDate = new Date(Date.now() + expiresIn * 1000); // Calculate expiry date
       await AsyncStorage.setItem('accessToken', accessToken);
@@ -48,7 +54,6 @@ const Login = ({navigation}) => {
       throw error;
     }
   };
-
 
   const refreshAccessToken = async () => {
     try {
@@ -63,12 +68,12 @@ const Login = ({navigation}) => {
         client_secret: client_secret,
         scope: '',
       };
-     
+
       const response = await fetch(`${BASE_URL}token/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(payload),
       });
@@ -99,7 +104,9 @@ const Login = ({navigation}) => {
         }
 
         // Check expiry date
-        const expiryDateString = await AsyncStorage.getItem('accessTokenExpiry');
+        const expiryDateString = await AsyncStorage.getItem(
+          'accessTokenExpiry',
+        );
         if (!expiryDateString) {
           throw new Error('Access token expiry information not found');
         }
@@ -162,7 +169,6 @@ const Login = ({navigation}) => {
 
   const loginNow = async () => {
     setLoading(true);
-
     const payload = {
       grant_type: 'password',
       client_id: client_id,
@@ -233,7 +239,9 @@ const Login = ({navigation}) => {
           JSON.stringify(response?.payload?.body?.user),
         );
         console.log('Login Successful!');
-        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
+        navigation.navigate('ChatScreen', {
+          accessToken: response?.payload?.body?.access_token,
+        });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],
@@ -274,7 +282,9 @@ const Login = ({navigation}) => {
           'userData',
           JSON.stringify(response?.payload?.body?.user),
         );
-        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
+        navigation.navigate('ChatScreen', {
+          accessToken: response?.payload?.body?.access_token,
+        });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],
@@ -316,7 +326,6 @@ const Login = ({navigation}) => {
     try {
       const response = await dispatch(socialLoginGoogle(payload));
 
-
       if (response?.payload?.body?.access_token) {
         await AsyncStorage.setItem(
           'accessToken',
@@ -326,7 +335,9 @@ const Login = ({navigation}) => {
           'userData',
           JSON.stringify(response?.payload?.body?.user),
         );
-        navigation.navigate('ChatScreen', { accessToken: response?.payload?.body?.access_token });
+        navigation.navigate('ChatScreen', {
+          accessToken: response?.payload?.body?.access_token,
+        });
         navigation.reset({
           index: 0,
           routes: [{name: 'ChatScreen'}],
@@ -343,11 +354,11 @@ const Login = ({navigation}) => {
   return (
     <ScrollView>
       <Block flex middle>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
+        {/* <TouchableOpacity
+          onPress={() => navigation.navigate('Selection')}
           style={styles.backButton}>
           <Icon name="arrowleft" size={24} color="#000" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View style={{height: 150}}>
           <Image
             source={require('../assets/splash.png')}
@@ -360,9 +371,10 @@ const Login = ({navigation}) => {
               fontSize: 30,
               color: '#000000',
               fontWeight: '500',
-              marginLeft: 20,
+              textAlign:'center'
+              // marginLeft: 20,
             }}>
-            Welcome Back{' '}
+            Welcome Back
           </Text>
         </Block>
         <Block flex>
@@ -421,7 +433,7 @@ const Login = ({navigation}) => {
               size="large"
               color="transparent"
               shadowless
-              onPress={() => navigation.navigate('Main')}>
+              onPress={() => navigation.navigate('BusinessSignUp')}>
               <Text
                 center
                 color={theme.COLORS.WHITE}
@@ -430,7 +442,7 @@ const Login = ({navigation}) => {
                   marginTop: -10,
                   color: 'black',
                 }}>
-                {"Don't have Account? SignUp Now"}
+                {"Don't have Account? Signup Now"}
               </Text>
             </Button>
           </Block>

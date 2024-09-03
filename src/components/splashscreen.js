@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const SplashScreen = ({ navigation }) => {
     useEffect(() => {
         const checkAccessToken = async () => {
             try {
                 const accessToken = await AsyncStorage.getItem('accessToken');
                 if (accessToken) {
-                    navigation.replace('ChatScreen');
+                    navigation.replace('Dashboard');
                 } else {
                     navigation.replace('Selection');
                 }
@@ -33,7 +32,6 @@ const SplashScreen = ({ navigation }) => {
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

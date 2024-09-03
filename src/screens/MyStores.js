@@ -1,31 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Dimensions, View, Text, TouchableOpacity, KeyboardAvoidingView, ScrollView, Image } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Dimensions,
+  View,
+  Text,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  Image,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Block, Button, Input, theme } from 'galio-framework';
-import { useDispatch, useSelector } from 'react-redux';
-const { width, height } = Dimensions.get('window');
+import {Block, Button, Input, theme} from 'galio-framework';
+import {useDispatch, useSelector} from 'react-redux';
+const {width, height} = Dimensions.get('window');
 import LineChartComponent from '../components/LineChart';
 import StoreTableView from '../components/StoreTableView';
 import TableView from '../components/TableView';
 import BarChartComponent from '../components/BarChart';
+import DrawerSceneWrapper from '../components/drawerSceneWrapper';
+import { getStores } from '../redux/slices/getStoresSlice';
 
-const MyStores = ({ navigation }) => {
+const MyStores = ({navigation}) => {
   const dispatch = useDispatch();
+  const stores = useSelector((state) => state.stores.data);
+  const status = useSelector((state) => state.stores.status);
+  const error = useSelector((state) => state.stores.error);
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(getStores());
+    }
+  }, [dispatch, status]);
 
-  const chartData = [
-    { label: 'Product 1', value: 10 },
-    { label: 'Product 2', value: 20 },
-    { label: 'Product 3', value: 15 },
-    { label: 'Product 4', value: 25 },
-    { label: 'Product 5', value: 18 },
+  // Transform store data into a format compatible with StoreTableView
+  const formattedStoreData = [
+    ['Name', 'Email', 'Address', 'Type', 'Status', 'Action'],
+    ...stores.map(store => [
+      store.title,
+      'N/A', // Email is not provided in the API response
+      store.address,
+      store.type,
+      store.status_label,
+      store.status === 'draft' ? 'Activate' : 'Edit',
+    ]),
   ];
 
-  const words1 = [
-    ['Search Subject', 'Product Category', 'Impressions', 'Cart Clicks', 'Avg CTR' ],
-    ['sleepy edibles', 'Edibles', '5643', '332', '2321',],
-    ['blueberry pre-rolls', 'Pre-rolls', '5454', '4354', '342',],
-    ['phat panda', 'Brand', '4343', '454','454', ],
-    ['4 pack pre-rolls', 'Pre-rolls', '3943', '3445', '453', ],
+
+  const performanceData = [
+    ['Product', 'Impressions', 'Sales', 'Clicks', 'Conversion Rate'],
+    ['sleepy edibles', '1200', '1200', '300', '25%'],
+    ['blueberry pre-rolls', '200', '900', '500', '55%'],
+    ['phat panda', '590', '800', '450', '56%'],
+  ];
+
+
+  const userFeedback = [
+    ['Query', 'feedback', 'Rating(1-5)'],
+    ['edibles that help', 'help me sleep', '4.5'],
+    ['cbd oil ', 'cbd oil for anxity', '4.7'],
+    ['relief tincture', 'pain relief', '4.2'],
+    ['strongest pre-rol', 'pain relief', '4.8'],
+    ['relief tincture', 'pain relief', '4.2'],
+  ];
+
+  const missedOpportunites = [
+    ['Query', 'Frquency', 'Impressions', 'notes'],
+    ['Vegna THC edible', '50', '0', 'no matching product'],
+    ['Organic Cbd oil', '200', '0', 'no matching product'],
+    ['pre-rolles tobbacco', '590', '0', 'no matching product'],
+  ];
+
+  const topQuries = [
+    ['Query', 'Frequency', 'Avg.CTR', 'Conversion Rate'],
+    ['Edibles that help sleep', '30', '10%', '4%'],
+    ['THC vape pen', '20', '20%', , '6%'],
+    ['phat panda', '50', '15%', '5%'],
+    ['CBD oil for anxity', '50', '8%', '5%'],
+  ];
+
+  const campaignPerformanceData = [
+    ['Campaign name', 'Target Query', 'Impressions', 'CTR', 'Conversion Rate'],
+    ['sleepy edibles sale', 'edibles for sleep', '1200', '11%', '25%'],
+    ['pre-rolls promo', 'for anxity', '900', '13%', '55%'],
+    ['vape pen discounts', 'THC vape pen', '9%', '450', '56%'],
   ];
 
   const words = [
@@ -48,12 +104,20 @@ const MyStores = ({ navigation }) => {
     ],
   ];
 
+  const openDrawer = () => {
+    navigation.openDrawer();
+  };
+
   return (
+    <DrawerSceneWrapper>
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.announcementBanner}>
           <Text style={styles.announcementText}>Activate Your Store!</Text>
         </View>
+        {/* <TouchableOpacity onPress={openDrawer}>
+          <New name="menu" size={30} style={{marginLeft: 10, marginTop: 30}} />
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={[
             styles.iconContainer1,
@@ -84,24 +148,30 @@ const MyStores = ({ navigation }) => {
           ]}>
           <Icon name="user" size={24} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.addButton, {top: height * 0.15, right: width * 0.02}]}
-          onPress={() => {}}>
+        <TouchableOpacity  onPress={() => navigation.navigate('ProductScreen')}
+          style={[styles.addButton, {top: height * 0.15, right: width * 0.02 , zIndex: 10 }]}>
           <Text style={styles.addButtonText}>+ Add Store</Text>
         </TouchableOpacity>
         <Block flex middle>
-          <KeyboardAvoidingView behavior="padding" enabled>
-            <View style={{padding: 5, marginBottom: 10, left: 10, top: height * 0.13}}>
+          <View behavior="padding" enabled>
+            <View
+              style={{
+                padding: 5,
+                marginBottom: 10,
+                left: 10,
+                top: height * 0.13,
+              }}>
               <Text style={{fontSize: 24, fontWeight: 'bold', color: 'black'}}>
                 My Stores
               </Text>
             </View>
             <View style={{padding: 10, marginTop: height * 0.1}}>
-              <StoreTableView data={words} />
+              <StoreTableView data={formattedStoreData} />
             </View>
-          </KeyboardAvoidingView>
+          </View>
         </Block>
-        <Block flex middle>
+        <Block flex >
+        <Text style={styles.dataTitle}>Overview</Text>
           <View style={styles.blocksContainer}>
             <View style={styles.block}>
               <Text style={styles.impression}>Total Products</Text>
@@ -135,13 +205,57 @@ const MyStores = ({ navigation }) => {
           </View>
         </Block>
         <Block flex middle>
-          <TableView data={words1} />  
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>Top Queries</Text>
+            <TableView data={topQuries} />
+          </View>
         </Block>
-        <Block>
-          <BarChartComponent data={chartData}/>
+        <Block flex middle>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>
+              Product Performance in Queries
+            </Text>
+            <Text style={{marginLeft: 20}}>Query matches:</Text>
+            <TableView data={performanceData} />
+          </View>
+        </Block>
+        <Block flex middle>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>User Feedback</Text>
+            <TableView data={userFeedback} />
+          </View>
+        </Block>
+        <Block flex middle>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>Missed Opportunities</Text>
+            <TableView data={missedOpportunites} />
+          </View>
+        </Block>
+        <Block flex middle>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>Search behavior analysis:</Text>
+            <Text style={{marginLeft: 20}}>
+              • <Text style={{fontWeight: 'bold'}}>Peak Search times</Text>:
+              Most Queries are entered between 6PM-9PM
+            </Text>
+            <Text style={{marginLeft: 20}}>
+              • <Text style={{fontWeight: 'bold'}}>Device Usage</Text>:
+              70% mobile, 20% desktop, 5% tablet
+            </Text>
+          </View>
+        </Block>
+        <Block flex middle>
+          <View style={styles.tableViewContainer}>
+            <Text style={styles.tableViewTitle}>
+              Campaign Performance
+            </Text>
+            <Text style={{marginLeft: 20}}>Marketing Camapign Performance:</Text>
+            <TableView data={campaignPerformanceData} />
+          </View>
         </Block>
       </ScrollView>
     </View>
+    </DrawerSceneWrapper>
   );
 };
 
@@ -194,7 +308,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     paddingBottom: 10,
-
   },
   blocksContainer1: {
     flexDirection: 'row',
@@ -220,7 +333,7 @@ const styles = StyleSheet.create({
   },
   block2: {
     width: '96%',
-    padding:60,
+    padding: 60,
     position: 'relative',
     backgroundColor: '#f0f0f0',
     borderRadius: 6,
@@ -235,7 +348,7 @@ const styles = StyleSheet.create({
   impression: {
     textAlign: 'justify',
     color: 'black',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     position: 'absolute',
     top: 5,
@@ -245,10 +358,10 @@ const styles = StyleSheet.create({
   impressionCount: {
     textAlign: 'justify',
     color: 'black',
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
     position: 'absolute',
-    bottom: 60,
+    bottom: 70,
     left: 30,
     margin: -20,
   },
@@ -274,6 +387,31 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 10,
+  },
+  tableViewContainer: {
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 5,
+  },
+  performanceTableContainer: {
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 5,
+  },
+  tableViewTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 10,
+    marginLeft: 20,
+    marginTop: 20,
+  },
+  dataTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 20,
+    marginLeft: 20,
   },
 });
 

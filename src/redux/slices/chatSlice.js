@@ -8,7 +8,6 @@ const initialState = {
   isAiTyping: false,
   threads: {}, // Store threads by threadId
 };
-
 const chatSlice = createSlice({
   name: 'chat',
   initialState,

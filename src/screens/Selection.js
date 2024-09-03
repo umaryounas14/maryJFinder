@@ -17,9 +17,8 @@ const Selection = ({ navigation }) => {
           resizeMode="contain"
         />
       </View>
-      <Text style={styles.welcomeText}>Welcome to MaryJfinder</Text>
       <View style={styles.buttonContainer}>
-        <Button
+        {/* <Button
           size="medium"
           shadowless
           color="#20B340"
@@ -27,21 +26,21 @@ const Selection = ({ navigation }) => {
           onPress={signUpNow}
         >
           Create Account
-        </Button>
-        {/* <Button
-          size="medium"
-          shadowless
-          color="#20B340"
-          style={[styles.button, { width: 200 }]} 
-          onPress={() => navigation.navigate('BusinessSignUp')}
-        >
-          Create Business Account
         </Button> */}
         <Button
           size="medium"
           shadowless
           color="#20B340"
-          style={[styles.button, { width: 200 }]} 
+          style={[styles.button, { width: 250 }]} 
+          onPress={() => navigation.navigate('BusinessSignUp')}
+        >
+          Create Business Account
+        </Button> 
+        <Button
+          size="medium"
+          shadowless
+          color="#20B340"
+          style={[styles.button, { width: 250 }]} 
           onPress={() => navigation.navigate('Login')}
         >
           Login

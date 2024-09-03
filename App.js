@@ -28,17 +28,20 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import store from './src/redux/store';
 import MyStores from './src/screens/MyStores';
-import Intractions from './src/screens/Intractions';
+import Reports from './src/screens/Reports';
 import Selection from './src/screens/Selection';
 import BusinessSignUp from './src/screens/BusinessSignUp';
 import OtpVerify from './src/screens/OtpVerify';
 import ChatScreen from './src/screens/ChatScreen';
 import ChatDrawer from './src/routes/ChatDrawer';
 import { ThemeProvider } from './src/context/themeContext';
+import Analytics from './src/screens/Analytics';
+import Intractions from './src/screens/Intractions';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import ProductScreen from './src/screens/ProductScreen';
+import ProductDetails from './src/screens/ProductDetails';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
-
 const CustomDrawerContent = ({navigation}) => {
   const [selectedScreen, setSelectedScreen] = useState('Dashboard');
 
@@ -67,36 +70,55 @@ const CustomDrawerContent = ({navigation}) => {
           styles.drawerLabel,
           selectedScreen === 'Dashboard' && {color: 'green'},
         ]}
+        icon={() => <Icon name="dashboard" size={24} color="black" />}
       />
       <DrawerItem
         label="My Stores"
         onPress={() => handleScreenPress('MyStores')}
         style={getScreenItemStyle('MyStores')}
+        icon={() => <Icon name="store" size={24} color="black" />}
+
       />
-      <DrawerItem
-        label="MaryJfinder Chat"
-        onPress={() => handleScreenPress('ChatScreen')}
-        style={getScreenItemStyle('ChatScreen')}
-      />
+
       <DrawerItem
         label="Intractions"
         onPress={() => handleScreenPress('Intractions')}
         style={getScreenItemStyle('Intractions')}
+        icon={() => <Icon name="ads-click" size={24} color="black" />}
+
       />
       <DrawerItem
         label="Analytics"
-        onPress={() => handleScreenPress('SignUpScreen')}
-        style={getScreenItemStyle('SignUpScreen')}
+        onPress={() => handleScreenPress('Analytics')}
+        style={getScreenItemStyle('Analytics')}
+        icon={() => <Icon name="analytics" size={24} color="black" />}
+
       />
       <DrawerItem
         label="Marketing Tools"
         onPress={() => handleScreenPress('SignUpScreen')}
         style={getScreenItemStyle('SignUpScreen')}
+        icon={() => <Icon name="build" size={24} color="black" />}
       />
       <DrawerItem
         label="Account Settings"
         onPress={() => handleScreenPress('SignUpScreen')}
         style={getScreenItemStyle('SignUpScreen')}
+        icon={() => <Icon name="settings" size={24} color="black" />}
+      />
+      <DrawerItem
+        label="Reports"
+        onPress={() => handleScreenPress('Reports')}
+        style={getScreenItemStyle('Reports')}
+        icon={() => <Icon name="edit-document" size={24} color="black" />}
+
+      />
+      <DrawerItem
+        label="Support"
+        onPress={() => handleScreenPress('SignUpScreen')}
+        style={getScreenItemStyle('SignUpScreen')}
+        icon={() => <Icon name="support" size={24} color="black" />}
+
       />
     </DrawerContentScrollView>
   );
@@ -105,26 +127,31 @@ const CustomDrawerContent = ({navigation}) => {
 const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
+    initialRouteName="Dashboard"
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{
-        headerShown: false, // Hide the header
-      }}>
-      <Drawer.Screen name="Dashboard" component={Dashboard} />
-      <Drawer.Screen name="MyStores" component={MyStores} />
+        headerShown: false, 
+        animationEnabled: true,
+        swipeEnabled: true,
+        gestureEnabled: true,
+        drawerStyle: { width: '65%', borderBottomRightRadius: 30, borderTopRightRadius: 30},
+        overlayColor: 'transparent',
+        drawerType: "slide",
+        drawerAnimation: 'slide',   }}>
+      <Drawer.Screen name="Dashboard" component={Dashboard} /> 
+      <Drawer.Screen name="MyStores"  component={MyStores} />
+      <Drawer.Screen name="Reports"   component={Reports} />
+      <Drawer.Screen name="Analytics" component={Analytics} />
       <Drawer.Screen name="Intractions" component={Intractions} />
     </Drawer.Navigator>
   );
 };
-
-
 const App = () => {
   const scaleValue = React.useRef(new Animated.Value(1)).current;
-
   const transitionConfig = {
     animation: 'timing',
     config: {duration: 300},
   };
-
   const screenOptions = {
     headerShown: false,
     gestureDirection: 'horizontal',
@@ -150,21 +177,22 @@ const App = () => {
           <Stack.Navigator
             initialRouteName="Splash"
             screenOptions={screenOptions}>
-            <Stack.Screen name="Splash" component={SplashScreen} />
+            <Stack.Screen name="Splash" component={SplashScreen} /> 
             <Stack.Screen name="Selection" component={Selection} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Main" component={SignUpScreen} />
-            <Stack.Screen name="Verification" component={Verification} />
-            <Stack.Screen name="About" component={About} />
+            <Stack.Screen name="Login" component={Login} /> 
+            <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} /> 
+            <Stack.Screen name="Main" component={SignUpScreen} />  
+            <Stack.Screen name="Verification" component={Verification} /> 
+            <Stack.Screen name="About" component={About} /> 
             <Stack.Screen name="AboutBusiness" component={AboutBusiness} />
-            <Stack.Screen name="UpgradePlan" component={UpgradePlan} />
-            <Stack.Screen name="AddBusiness" component={AddBusiness} />
-            <Stack.Screen name="Dashboard" component={DrawerNavigator} />
-            <Stack.Screen name="ActivateStore" component={ActivateStore} />
-            <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} />
-            <Stack.Screen name="OtpVerify" component={OtpVerify} />
-            <Stack.Screen name="ProductScreen" component={ProductScreen} />
-            <Stack.Screen name="ChatScreen" component={ChatDrawer} />
+            <Stack.Screen name="UpgradePlan" component={UpgradePlan} /> 
+            <Stack.Screen name="AddBusiness" component={AddBusiness} /> 
+            <Stack.Screen name="Dashboard" component={DrawerNavigator} /> 
+            <Stack.Screen name="ActivateStore" component={ActivateStore} /> 
+            <Stack.Screen name="OtpVerify" component={OtpVerify} /> 
+            <Stack.Screen name="ChatScreen"     component={ChatDrawer} />  
+            <Stack.Screen name="ProductScreen"  component={ProductScreen} /> 
+            <Stack.Screen name='ProductDetails' component={ProductDetails}/>
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

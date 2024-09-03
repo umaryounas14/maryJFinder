@@ -7,7 +7,6 @@ import ChatScreen from '../screens/ChatScreen';
 import { ThemeProvider , useTheme, lightTheme, darkTheme} from '../context/themeContext';
 
 const Drawer = createDrawerNavigator();
-
 const CustomDrawerContent = ({
   navigation,
   isLoggedIn,
@@ -23,11 +22,9 @@ const CustomDrawerContent = ({
   const navigateToChat = (threadId) => {
     navigation.navigate('ChatScreen', { threadId });
   };
-
   const handleSignUp = () => {
     navigation.navigate('Main');
   };
-
   const handleLogin = () => {
     navigation.navigate('Login');
   };
@@ -134,12 +131,11 @@ const ChatDrawer = ({ navigation }) => {
         Accept: 'application/json',
         Authorization: `Bearer ${accessToken}`,
       };
-
       const response = await axios.get('https://maryjfinder.com/api/chatbot/conversations', {
         headers: headers,
         params: { page: currentPageRef.current }
       });
-
+      console.log('response',response)
       if (response.data.status_code === 200) {
         setConversations(response.data.body.response); // Set initial conversations
         currentPageRef.current += 1; // Update currentPage using ref
