@@ -143,7 +143,6 @@ const ChatScreen = ({route}) => {
         dispatch(setError(error.message));
       });
   };
-
   const handleEventStream = eventStream => {
     const lines = eventStream.split('\n\n');
     let accumulatedText = '';
@@ -179,7 +178,6 @@ const ChatScreen = ({route}) => {
 
     dispatch(setIsAiTyping(false));
   };
-
   const sendCompleteMessage = (messageContent, isMsgComplete, created_at) => {
     if (messageContent.trim()) {
       const completeMessage = {
@@ -196,7 +194,6 @@ const ChatScreen = ({route}) => {
       );
     }
   };
-
   const parseEvent = input => {
     const event = {type: '', data: ''};
     const lines = input.split('\n');
@@ -217,7 +214,6 @@ const ChatScreen = ({route}) => {
     }
     return event;
   };
-
   const formatMessageTime = createdAt => {
     const date = new Date(createdAt);
     const hours = date.getHours();
@@ -227,11 +223,9 @@ const ChatScreen = ({route}) => {
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
-
   const openDrawer = () => {
     navigation.openDrawer();
   };
-
   const startNewChat = () => {
     Alert.alert(
       'New Chat',
@@ -254,7 +248,6 @@ const ChatScreen = ({route}) => {
       {cancelable: true},
     );
   };
-
   const processMessages = fetchedMessages => {
     const processedMessages = [];
 
@@ -281,6 +274,7 @@ const ChatScreen = ({route}) => {
     // Define a regular expression to match product URLs and extract product ID
     const productIdPattern = /\/product\/(\d+)$/;
     const productIdMatch = url.match(productIdPattern);
+    console.log('productIdMatch-=-=-=-=-',productIdMatch);
     if (productIdMatch) {
       const productId = productIdMatch[1];
         navigation.navigate('ProductScreen', { productId });

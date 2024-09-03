@@ -6,7 +6,7 @@ import MapComponent from '../components/MapView';
 import { useDispatch } from 'react-redux';
 import { trackAnalytics } from '../redux/slices/analyticsSlice';
 const { width } = Dimensions.get('window');
-const ProductScreen = ({ route }) => {
+const ProductScreen = ({ route ,navigation}) => {
   const { productId } = route.params; // Get the productId from route params
   // const{productId}='1090909090';
   const [product, setProduct] = useState(null);
@@ -50,13 +50,57 @@ const ProductScreen = ({ route }) => {
       fetchProduct();
     }
   }, [productId, dispatch]);
-  const handleAddToCart = () => {
-    dispatch(trackAnalytics({
-      product_id: productId,
-      type: 'cart_click',
-    }));
-    // Add your add to cart logic here
-  };
+
+
+const handleAddToCart = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (!accessToken) {
+      throw new Error('No access token found');
+    }
+    // Analytics tracking API call
+    await axios.post(
+      'https://maryjfinder.com/api/analytics/track',
+      {
+        product_id: productId,
+        type: 'cart_click',
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json',
+        },
+      }
+    );
+    // Add to cart API call
+    await axios.post(
+      'https://maryjfinder.com/api/cart/add',
+      {
+        product_id: productId,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json',
+        },
+      }
+    );
+
+    // Navigate to the next screen
+    navigation.navigate('ProductScreen', { productId });
+  } catch (error) {
+    console.error('Error adding to cart or tracking analytics:', error);
+  }
+};
+
+  // const handleAddToCart = () => {
+  //   dispatch(trackAnalytics({
+  //     product_id: productId,
+  //     type: 'cart_click',
+  //   }));
+  //   navigation.navigate('ProductScreen', { productId });
+  //   // Add your add to cart logic here
+  // };
   const handleMapLoaded = () => {
     dispatch(trackAnalytics({
       product_id: productId,
