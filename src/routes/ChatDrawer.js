@@ -135,7 +135,7 @@ const ChatDrawer = ({ navigation }) => {
         headers: headers,
         params: { page: currentPageRef.current }
       });
-      console.log('response--------------------======================',response)
+      console.log('response--------------------======================',response?.data?.body)
       if (response.data.status_code === 200) {
         setConversations(response.data.body.response); // Set initial conversations
         currentPageRef.current += 1; // Update currentPage using ref

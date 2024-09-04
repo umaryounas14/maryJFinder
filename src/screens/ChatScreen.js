@@ -271,6 +271,7 @@ const ChatScreen = ({route}) => {
   };
 
   const handleLinkPress = (url) => {
+    console.log('url-----------------------',url)
     // Define a regular expression to match product URLs and extract product ID
     const productIdPattern = /\/product\/(\d+)$/;
     const productIdMatch = url.match(productIdPattern);
