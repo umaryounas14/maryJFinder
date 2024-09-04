@@ -248,43 +248,82 @@ const ChatScreen = ({route}) => {
       {cancelable: true},
     );
   };
-  const processMessages = fetchedMessages => {
-    const processedMessages = [];
+  // const processMessages = fetchedMessages => {
+  //   const processedMessages = [];
 
-    fetchedMessages.forEach((message, index) => {
-      if (message.message) {
-        processedMessages.push({
-          role: 'user',
-          text: message.message,
-          created_at: message.created_at,
-        });
-      }
-      if (message.response) {
-        processedMessages.push({
-          role: 'ai',
-          text: message.response,
-          created_at: message.updated_at,
-        });
-      }
-    });
+  //   fetchedMessages.forEach((message, index) => {
+  //     if (message.message) {
+  //       processedMessages.push({
+  //         role: 'user',
+  //         text: message.message,
+  //         created_at: message.created_at,
+  //       });
+  //     }
+  //     if (message.response) {
+  //       processedMessages.push({
+  //         role: 'ai',
+  //         text: message.response,
+  //         created_at: message.updated_at,
+  //       });
+  //     }
+  //   });
+  //   return processedMessages;
+  // };
+  const processMessages = fetchedMessages => {
+    const processedMessages = fetchedMessages.map((message, index) => ({
+      id: message.id || `${index}_${new Date().getTime()}`, // Assign an ID if it's missing
+      role: message.role,
+      text: message.text || message.response || message.message,
+      created_at: message.created_at || message.updated_at,
+    }));
+  
     return processedMessages;
   };
+ 
 
-  const handleLinkPress = (url) => {
-    console.log('url-----------------------',url)
-    // Define a regular expression to match product URLs and extract product ID
-    const productIdPattern = /\/product\/(\d+)$/;
-    const productIdMatch = url.match(productIdPattern);
-    console.log('productIdMatch-=-=-=-=-',productIdMatch);
-    if (productIdMatch) {
-      const productId = productIdMatch[1];
-        navigation.navigate('ProductScreen', { productId });
+  const handleLinkPress = (url, messageId) => {
+    console.log('Link pressed:', url, 'Message ID:', messageId);
+   // Define a regular expression to match product URLs and extract product ID
+    const productPattern = /\/product\/(\d+)$/;
+    const cartPattern = /\/product\/cart\/(\d+)$/;
+    const mapPattern = /maps\/search\?/;
+  
+    const productMatch = url.match(productPattern);
+    const cartMatch = url.match(cartPattern);
+    if (cartMatch) {
+      const productId = cartMatch[1];
+      navigation.navigate('ProductScreen', { productId, messageId });
+    } else if (productMatch) {
+      const productId = productMatch[1];
+      navigation.navigate('ProductScreen', { productId, messageId });
+    } else if (mapPattern.test(url)) {
+      // Handle map URL
+      Linking.openURL(url);
     } else {
+      // For all other URLs
       Linking.openURL(url);
     }
   };
   
-
+  
+  // const handleLinkPress = (url,messageId) => {
+  //   console.log('Link pressed:', url, 'Message ID:', messageId);
+  //   // console.log('url-----------------------++++',url);
+  //   // Define a regular expression to match product URLs and extract product ID
+  //   const productIdPattern = /\/product\/(\d+)$/;
+  //   const cartPattern = /\/product\/cart\/(\d+)$/;
+  // const mapPattern = /maps\/search\?/;
+  //   const productIdMatch = url.match(productIdPattern);
+  //   console.log('productIdMatch-=-=-=-=-',productIdMatch);
+  //   if (productIdMatch) {
+  //       const productId = productIdMatch[1];
+  //       navigation.navigate('ProductScreen', { productId,messageId });
+  //   } else {
+  //     Linking.openURL(url);
+  //   }
+  // };
+  
+  
   return (
     <View
       style={[styles.container, {backgroundColor: theme.colors.background}]}>
@@ -307,6 +346,7 @@ const ChatScreen = ({route}) => {
           />
         </TouchableOpacity>
       </View>
+  
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={styles.messagesContainer}
@@ -358,7 +398,8 @@ const ChatScreen = ({route}) => {
                       ) : (
                         <Markdown
                           style={{color: theme.colors.text}}
-                          onLinkPress={handleLinkPress} // Handle link press
+                          onLinkPress={(url) => handleLinkPress(url, message.id)} 
+                          // onLinkPress={handleLinkPress} // Handle link press
                         >
                           {message?.text}
                         </Markdown>

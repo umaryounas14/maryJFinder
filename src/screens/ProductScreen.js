@@ -7,7 +7,12 @@ import { useDispatch } from 'react-redux';
 import { trackAnalytics } from '../redux/slices/analyticsSlice';
 const { width } = Dimensions.get('window');
 const ProductScreen = ({ route ,navigation}) => {
-  const { productId } = route.params; // Get the productId from route params
+  const { productId, messageId, url ,type } = route.params; 
+  console.log('type000000000000000000000000000000',type)
+  // Get the productId from route params
+  console.log('productId--------------productId------------------------------',productId);
+  console.log('messageId--------------messageId------------------------------',messageId)
+
   // const{productId}='1090909090';
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,88 +29,115 @@ const ProductScreen = ({ route ,navigation}) => {
           throw new Error('No access token found');
         }
         // Fetch the product details from the API
-        const response = await fetch(`https://maryjfinder.com/api/product/${productId}`, {
+        const analyticsType = route.params.analyticsType; // Default to 'product_click'
+        const messageId = route.params.messageId;
+        const response = await fetch
+        (
+          `https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`
+          // `https://maryjfinder.com/api/product/${productId}`
+          , 
+          {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Accept': 'application/json',
           },
         });
+        // console.log('responseproductisssssdddd    new    -0=====',response);
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Error ${response.status}: ${errorText}`);
         }
         const data = await response.json();
+        console.log('data==================================newone==-------',data);
         setProduct(data);
+       
         dispatch(trackAnalytics({
           product_id: productId,
+          message_id : messageId,
           type: 'impression',
         }));
+        // if (analyticsType === 'product_click') {
+        //   console.log('product_click-=-=-=-=-=-=-=-=-=-=-=-=-=-=9090909090900')
+        //   // navigation.navigate('ProductDetails', { productId, messageId });
+        // } else if (analyticsType === 'cart_click') {
+        //   console.log('cart_click090909-9-9-9-9-9-09-9-9-9-9-9-9-9-9-9-9-9-9-9')
+        //   // navigation.navigate('LoginScreen');
+        // }
       } catch (error) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-    if (productId) {
+    if (productId,messageId) {
       fetchProduct();
     }
-  }, [productId, dispatch]);
+  }, [productId, dispatch,messageId]);
 
 
-const handleAddToCart = async () => {
-  try {
-    const accessToken = await AsyncStorage.getItem('accessToken');
-    if (!accessToken) {
-      throw new Error('No access token found');
-    }
-    // Analytics tracking API call
-    await axios.post(
-      'https://maryjfinder.com/api/analytics/track',
-      {
-        product_id: productId,
-        type: 'cart_click',
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Accept': 'application/json',
-        },
-      }
-    );
-    // Add to cart API call
-    await axios.post(
-      'https://maryjfinder.com/api/cart/add',
-      {
-        product_id: productId,
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Accept': 'application/json',
-        },
-      }
-    );
+// const handleAddToCart = async () => {
+//   try {
+//     const accessToken = await AsyncStorage.getItem('accessToken');
+//     if (!accessToken) {
+//       throw new Error('No access token found');
+//     }
+//     // Analytics tracking API call
+//     await axios.post(
+//       'https://maryjfinder.com/api/analytics/track',
+//       {
+//         product_id: productId,
+//         type: 'cart_click',
+//       },
+//       {
+//         headers: {
+//           'Authorization': `Bearer ${accessToken}`,
+//           'Accept': 'application/json',
+//         },
+//       }
+//     );
+//     // Add to cart API call
+//     await axios.post(
+//       'https://maryjfinder.com/api/cart/add',
+//       {
+//         product_id: productId,
+//       },
+//       {
+//         headers: {
+//           'Authorization': `Bearer ${accessToken}`,
+//           'Accept': 'application/json',
+//         },
+//       }
+//     );
 
-    // Navigate to the next screen
-    navigation.navigate('ProductScreen', { productId });
-  } catch (error) {
-    console.error('Error adding to cart or tracking analytics:', error);
-  }
-};
+//     // Navigate to the next screen
+//     navigation.navigate('ProductScreen', { productId });
+//   } catch (error) {
+//     console.error('Error adding to cart or tracking analytics:', error);
+//   }
+// };
 
-  // const handleAddToCart = () => {
-  //   dispatch(trackAnalytics({
-  //     product_id: productId,
-  //     type: 'cart_click',
-  //   }));
-  //   navigation.navigate('ProductScreen', { productId });
-  //   // Add your add to cart logic here
-  // };
+  const handleAddToCart = () => {
+    dispatch(trackAnalytics({
+      product_id: productId,
+      type: 'cart_click',
+
+    }));
+    // if (analyticsType === 'product_click') {
+    //   console.log('product_click-=-=-=-=-=-=-=-=-=-=-=-=-=-=9090909090900')
+    //    navigation.navigate('ProductDetails', { productId, messageId });
+    // } else if (analyticsType === 'cart_click') {
+    //   console.log('cart_click090909-9-9-9-9-9-09-9-9-9-9-9-9-9-9-9-9-9-9-9')
+    //   // navigation.navigate('LoginScreen');
+    // }
+    navigation.navigate('ProductDetails', { productId, messageId});
+    // Add your add to cart logic here
+  };
   const handleMapLoaded = () => {
     dispatch(trackAnalytics({
       product_id: productId,
       type: 'map_click',
     }));
+
   };
   const handleMarkerPress = () => {
     dispatch(trackAnalytics({

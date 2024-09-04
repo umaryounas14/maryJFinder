@@ -21,7 +21,7 @@ export const trackAnalytics = createAsyncThunk(
         },
         body: JSON.stringify(trackingData),
       });
-
+      console.log('response======================analytictracking',response)
       // Check if response is OK
       if (!response.ok) {
         throw new Error('Failed to track analytics');
@@ -31,7 +31,7 @@ export const trackAnalytics = createAsyncThunk(
       const responseData = await response.json();
 
       // Log the parsed response data
-      console.log('Parsed Response Data:', responseData);
+      console.log('Parsed Response Data-=-=-=-=-=-=-=-=-=:', responseData);
 
       return responseData;
     } catch (error) {
