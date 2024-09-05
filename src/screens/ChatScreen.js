@@ -292,10 +292,10 @@ const ChatScreen = ({route}) => {
     const cartMatch = url.match(cartPattern);
     if (cartMatch) {
       const productId = cartMatch[1];
-      navigation.navigate('ProductScreen', { productId, messageId });
+      navigation.navigate('ProductScreen', { productId, messageId , linkUrl: url});
     } else if (productMatch) {
       const productId = productMatch[1];
-      navigation.navigate('ProductScreen', { productId, messageId });
+      navigation.navigate('ProductScreen', { productId, messageId , linkUrl: url});
     } else if (mapPattern.test(url)) {
       // Handle map URL
       Linking.openURL(url);

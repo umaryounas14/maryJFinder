@@ -14,7 +14,6 @@ const ProductDetails = ({ route }) => {
       </View>
     );
   }
-
   // Handle error state
   if (status === 'failed') {
     return (

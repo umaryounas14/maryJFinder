@@ -7,8 +7,8 @@ import { useDispatch } from 'react-redux';
 import { trackAnalytics } from '../redux/slices/analyticsSlice';
 const { width } = Dimensions.get('window');
 const ProductScreen = ({ route ,navigation}) => {
-  const { productId, messageId, url ,type } = route.params; 
-  console.log('type000000000000000000000000000000',type)
+  const { productId, messageId, linkUrl  } = route.params || {};
+  console.log('linkUrl55555555555555555555linkUrl',linkUrl)
   // Get the productId from route params
   console.log('productId--------------productId------------------------------',productId);
   console.log('messageId--------------messageId------------------------------',messageId)
@@ -29,7 +29,7 @@ const ProductScreen = ({ route ,navigation}) => {
           throw new Error('No access token found');
         }
         // Fetch the product details from the API
-        const analyticsType = route.params.analyticsType; // Default to 'product_click'
+        const analyticsType = linkUrl.includes('/product/') ? 'product_click' : 'cart_click'; // Default to 'product_click'
         const messageId = route.params.messageId;
         const response = await fetch
         (
@@ -56,13 +56,6 @@ const ProductScreen = ({ route ,navigation}) => {
           message_id : messageId,
           type: 'impression',
         }));
-        // if (analyticsType === 'product_click') {
-        //   console.log('product_click-=-=-=-=-=-=-=-=-=-=-=-=-=-=9090909090900')
-        //   // navigation.navigate('ProductDetails', { productId, messageId });
-        // } else if (analyticsType === 'cart_click') {
-        //   console.log('cart_click090909-9-9-9-9-9-09-9-9-9-9-9-9-9-9-9-9-9-9-9')
-        //   // navigation.navigate('LoginScreen');
-        // }
       } catch (error) {
         setError(error.message);
       } finally {
@@ -72,7 +65,7 @@ const ProductScreen = ({ route ,navigation}) => {
     if (productId,messageId) {
       fetchProduct();
     }
-  }, [productId, dispatch,messageId]);
+  }, [productId, dispatch,messageId,linkUrl]);
 
 
 // const handleAddToCart = async () => {
@@ -115,23 +108,87 @@ const ProductScreen = ({ route ,navigation}) => {
 //     console.error('Error adding to cart or tracking analytics:', error);
 //   }
 // };
+const handleAddToCart = async () => {
+  console.log('32323232323232323233')
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (!accessToken) {
+      throw new Error('No access token found');
+    }
 
-  const handleAddToCart = () => {
-    dispatch(trackAnalytics({
-      product_id: productId,
-      type: 'cart_click',
+    // Track the cart click
+    await fetch('https://maryjfinder.com/api/analytics/track', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        type: 'cart_click',
+      }),
+    });
 
-    }));
-    // if (analyticsType === 'product_click') {
-    //   console.log('product_click-=-=-=-=-=-=-=-=-=-=-=-=-=-=9090909090900')
-    //    navigation.navigate('ProductDetails', { productId, messageId });
-    // } else if (analyticsType === 'cart_click') {
-    //   console.log('cart_click090909-9-9-9-9-9-09-9-9-9-9-9-9-9-9-9-9-9-9-9')
-    //   // navigation.navigate('LoginScreen');
-    // }
-    navigation.navigate('ProductDetails', { productId, messageId});
-    // Add your add to cart logic here
-  };
+    // Add to cart API call
+    await fetch('https://maryjfinder.com/api/cart/add', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        product_id: productId,
+      }),
+    });
+
+    // Determine the navigation target based on the linkUrl
+    let navigationTarget = '';
+    let params = {};
+    const analyticsType = linkUrl.includes('/product/') ? 'product_click' : 'cart_click';
+    if (linkUrl.includes('/product/cart/')) {
+      // console.log('ooooooooooooooooooooooooooooooooooooooooocartoooooooooooooooo')
+      navigationTarget = 'Login';
+      
+      // Fetch product data to pass to the next screen
+      // const response = await fetch(`https://maryjfinder.com/api/product/${productId}`);
+      const response = await fetch(`https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch product data');
+      }
+      const productData = await response.json();
+      // console.log('productData-=-=-=-=-=-=-=-=-=-=-',productData)
+      params = { productData, messageId };
+    } else if (linkUrl.includes('/product/')) {
+      // console.log('0000000000000000000000000000000000product00000000000000000000000000')
+      navigationTarget = 'ProductDetails';
+    } else {
+      console.warn('Unhandled URL type:', linkUrl);
+      return;
+    }
+    // Navigate to the appropriate screen with the params
+    navigation.navigate(navigationTarget, params);
+
+  } catch (error) {
+    console.error('Error adding to cart or tracking analytics:', error);
+  }
+};
+
+  // const handleAddToCart = () => {
+  //   dispatch(trackAnalytics({
+  //     product_id: productId,
+  //     type: 'cart_click',
+
+  //   }));
+  //   // if (analyticsType === 'product_click') {
+  //   //   console.log('product_click-=-=-=-=-=-=-=-=-=-=-=-=-=-=9090909090900')
+  //   //    navigation.navigate('ProductDetails', { productId, messageId });
+  //   // } else if (analyticsType === 'cart_click') {
+  //   //   console.log('cart_click090909-9-9-9-9-9-09-9-9-9-9-9-9-9-9-9-9-9-9-9')
+  //   //   // navigation.navigate('LoginScreen');
+  //   // }
+  //   navigation.navigate('ProductDetails', { productId, messageId});
+  //   // Add your add to cart logic here
+  // };
   const handleMapLoaded = () => {
     dispatch(trackAnalytics({
       product_id: productId,
