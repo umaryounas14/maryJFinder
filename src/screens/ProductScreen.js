@@ -140,7 +140,6 @@ const handleAddToCart = async () => {
         product_id: productId,
       }),
     });
-
     // Determine the navigation target based on the linkUrl
     let navigationTarget = '';
     let params = {};
