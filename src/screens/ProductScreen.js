@@ -11,9 +11,7 @@ const ProductScreen = ({ route ,navigation}) => {
   console.log('linkUrl55555555555555555555linkUrl',linkUrl)
   // Get the productId from route params
   console.log('productId--------------productId------------------------------',productId);
-  console.log('messageId--------------messageId------------------------------',messageId)
-
-  // const{productId}='1090909090';
+  console.log('messageId--------------messageId------------------------------',messageId);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,7 +32,6 @@ const ProductScreen = ({ route ,navigation}) => {
         const response = await fetch
         (
           `https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`
-          // `https://maryjfinder.com/api/product/${productId}`
           , 
           {
           headers: {
@@ -42,7 +39,7 @@ const ProductScreen = ({ route ,navigation}) => {
             'Accept': 'application/json',
           },
         });
-        // console.log('responseproductisssssdddd    new    -0=====',response);
+     
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Error ${response.status}: ${errorText}`);
@@ -145,9 +142,12 @@ const handleAddToCart = async () => {
     let params = {};
     const analyticsType = linkUrl.includes('/product/') ? 'product_click' : 'cart_click';
     if (linkUrl.includes('/product/cart/')) {
+      {   navigationTarget = 'AddToCart';
+        params = { productId, messageId,analyticsType };
+      }
       // console.log('ooooooooooooooooooooooooooooooooooooooooocartoooooooooooooooo')
-      navigationTarget = 'Login';
-      
+      // navigationTarget = 'AddToCart';
+    
       // Fetch product data to pass to the next screen
       // const response = await fetch(`https://maryjfinder.com/api/product/${productId}`);
       const response = await fetch(`https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`)
@@ -155,11 +155,12 @@ const handleAddToCart = async () => {
         throw new Error('Failed to fetch product data');
       }
       const productData = await response.json();
-      // console.log('productData-=-=-=-=-=-=-=-=-=-=-',productData)
+       console.log('productData-=-=-=-=-=44444444-=-=-=-=-=-0000000000000000000000000000000000000000000000000000',response)
       params = { productData, messageId };
     } else if (linkUrl.includes('/product/')) {
       // console.log('0000000000000000000000000000000000product00000000000000000000000000')
       navigationTarget = 'ProductDetails';
+      params = { productId, messageId,analyticsType };
     } else {
       console.warn('Unhandled URL type:', linkUrl);
       return;

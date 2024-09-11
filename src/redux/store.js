@@ -1,6 +1,7 @@
 import {
   combineReducers,
   configureStore,
+  createReducer,
 } from '@reduxjs/toolkit';
 import {persistReducer, persistStore} from 'redux-persist';
 import signUpReducer from './slices/signUpSlice';
@@ -12,7 +13,7 @@ import chatReducer from './slices/chatSlice'
 import googleLoginReducer from './slices/googleLoginSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import analyticsReducer from './slices/analyticsSlice';
-
+import cartReducer from './slices/cartSlice';
 const rootReducer = combineReducers({
     signUp: signUpReducer,
     login: loginReducer,
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
     chat: chatReducer,
     google: googleLoginReducer,
     analytics: analyticsReducer,
+    cart:cartReducer
 });
 
 const persistConfig = {

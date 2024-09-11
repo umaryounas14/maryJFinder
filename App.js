@@ -40,6 +40,7 @@ import Intractions from './src/screens/Intractions';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ProductScreen from './src/screens/ProductScreen';
 import ProductDetails from './src/screens/ProductDetails';
+import AddToCart from './src/screens/AddToCart';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const CustomDrawerContent = ({navigation}) => {
@@ -177,7 +178,7 @@ const App = () => {
           <Stack.Navigator
             initialRouteName="Splash"
             screenOptions={screenOptions}>
-            <Stack.Screen name="Splash" component={SplashScreen} /> 
+            {/* <Stack.Screen name="Splash" component={SplashScreen} /> 
             <Stack.Screen name="Selection" component={Selection} />
             <Stack.Screen name="Login" component={Login} /> 
             <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} /> 
@@ -189,10 +190,11 @@ const App = () => {
             <Stack.Screen name="AddBusiness" component={AddBusiness} /> 
             <Stack.Screen name="Dashboard" component={DrawerNavigator} /> 
             <Stack.Screen name="ActivateStore" component={ActivateStore} /> 
-            <Stack.Screen name="OtpVerify" component={OtpVerify} /> 
+            <Stack.Screen name="OtpVerify" component={OtpVerify} />  */}
             <Stack.Screen name="ChatScreen"     component={ChatDrawer} />  
             <Stack.Screen name="ProductScreen"  component={ProductScreen} /> 
             <Stack.Screen name='ProductDetails' component={ProductDetails}/>
+            <Stack.Screen name='AddToCart' component={AddToCart}/>
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

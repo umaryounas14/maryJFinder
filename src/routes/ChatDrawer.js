@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ChatScreen from '../screens/ChatScreen';
 import { ThemeProvider , useTheme, lightTheme, darkTheme} from '../context/themeContext';
-
 const Drawer = createDrawerNavigator();
 const CustomDrawerContent = ({
   navigation,
@@ -19,9 +18,17 @@ const CustomDrawerContent = ({
 }) => {
   const { theme, toggleTheme, isDarkTheme } = useTheme();
 
+  // const navigateToChat = (threadId) => {
+  //   navigation.navigate('ChatScreen', { threadId });
+  // };
   const navigateToChat = (threadId) => {
-    navigation.navigate('ChatScreen', { threadId });
+    if (threadId) {
+      navigation.navigate('ChatScreen', { threadId });
+    } else {
+      console.error('No threadId provided');
+    }
   };
+  
   const handleSignUp = () => {
     navigation.navigate('Main');
   };
@@ -114,7 +121,6 @@ const CustomDrawerContent = ({
     </View>
   );
 };
-
 const ChatDrawer = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [conversations, setConversations] = useState([]);
@@ -122,11 +128,11 @@ const ChatDrawer = ({ navigation }) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const currentPageRef = useRef(1); 
   const totalPages = 22; // Example, should be fetched from API
-
   const fetchConversations = useCallback(async () => {
     try {
       setIsLoadingConversations(true); // Start loading initial conversations
       const accessToken = await AsyncStorage.getItem('accessToken');
+      console.log('accessToken',accessToken)
       const headers = {
         Accept: 'application/json',
         Authorization: `Bearer ${accessToken}`,
@@ -135,7 +141,7 @@ const ChatDrawer = ({ navigation }) => {
         headers: headers,
         params: { page: currentPageRef.current }
       });
-      console.log('response--------------------======================',response?.data?.body)
+      console.log('response--------------------=====================chatdrawer=',response?.data?.body?.response)
       if (response.data.status_code === 200) {
         setConversations(response.data.body.response); // Set initial conversations
         currentPageRef.current += 1; // Update currentPage using ref
@@ -148,13 +154,9 @@ const ChatDrawer = ({ navigation }) => {
       setIsLoadingConversations(false); // Stop loading initial conversations
     }
   }, []);
-
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
-
- 
-
 
   const handleLogout = useCallback(async () => {
     try {
@@ -175,6 +177,7 @@ const ChatDrawer = ({ navigation }) => {
       if (!isLoadingMore && currentPageRef.current <= totalPages) {
         setIsLoadingMore(true); // Start loading more conversations
         const accessToken = await AsyncStorage.getItem('accessToken');
+       
         const headers = {
           Accept: 'application/json',
           Authorization: `Bearer ${accessToken}`,
@@ -184,7 +187,7 @@ const ChatDrawer = ({ navigation }) => {
           headers: headers,
           params: { page: currentPageRef.current }
         });
-
+console.log('response--------------------fetchMoreConversations]]]]]',response?.data?.thread_id)
         if (response.data.status_code === 200) {
           setConversations((prevConversations) => [...prevConversations, ...response.data.body.response]);
           currentPageRef.current += 1; // Update currentPage using ref

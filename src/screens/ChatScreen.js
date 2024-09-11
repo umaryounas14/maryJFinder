@@ -40,9 +40,10 @@ const BASE_URL = 'https://maryjfinder.com/api/chatbot/chat';
 const ChatScreen = ({route}) => {
   const {theme, toggleTheme, isDarkTheme} = useTheme();
   const {threadId, accessToken} = route.params || {
-    threadId: null,
-    accessToken: null,
+    // threadId: null,
+    // accessToken: null,
   };
+  console.log('threadId0-0-0-0-',threadId);
   const [inputText, setInputText] = useState('');
   const [isLoadingSend, setIsLoadingSend] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -276,11 +277,8 @@ const ChatScreen = ({route}) => {
       text: message.text || message.response || message.message,
       created_at: message.created_at || message.updated_at,
     }));
-  
     return processedMessages;
   };
- 
-
   const handleLinkPress = (url, messageId) => {
     console.log('Link pressed:', url, 'Message ID:', messageId);
    // Define a regular expression to match product URLs and extract product ID

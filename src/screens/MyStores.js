@@ -22,16 +22,16 @@ import { getStores } from '../redux/slices/getStoresSlice';
 
 const MyStores = ({navigation}) => {
   const dispatch = useDispatch();
-  const stores = useSelector((state) => state.stores.data);
-  const status = useSelector((state) => state.stores.status);
-  const error = useSelector((state) => state.stores.error);
+   const stores = useSelector((state) => state.stores.data);
+  // const status = useSelector((state) => state.stores.status);
+  // const error = useSelector((state) => state.stores.error);
   useEffect(() => {
     if (status === 'idle') {
       dispatch(getStores());
     }
   }, [dispatch, status]);
 
-  // Transform store data into a format compatible with StoreTableView
+  //Transform store data into a format compatible with StoreTableView
   const formattedStoreData = [
     ['Name', 'Email', 'Address', 'Type', 'Status', 'Action'],
     ...stores.map(store => [
@@ -42,7 +42,7 @@ const MyStores = ({navigation}) => {
       store.status_label,
       store.status === 'draft' ? 'Activate' : 'Edit',
     ]),
-  ];
+   ];
 
 
   const performanceData = [
@@ -166,7 +166,7 @@ const MyStores = ({navigation}) => {
               </Text>
             </View>
             <View style={{padding: 10, marginTop: height * 0.1}}>
-              <StoreTableView data={formattedStoreData} />
+              {/* <StoreTableView data={formattedStoreData} /> */}
             </View>
           </View>
         </Block>

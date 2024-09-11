@@ -31,7 +31,7 @@ export const trackAnalytics = createAsyncThunk(
       const responseData = await response.json();
 
       // Log the parsed response data
-      console.log('Parsed Response Data-=-=-=-=-=-=-=-=-=:', responseData);
+      console.log('Parsed Response Data-=-=-=-=-=-=-=-=-=:', responseData?.body);
 
       return responseData;
     } catch (error) {
