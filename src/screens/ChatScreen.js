@@ -1,5 +1,4 @@
 // ChatScreen.js
-
 import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
@@ -43,7 +42,7 @@ const ChatScreen = ({route}) => {
     // threadId: null,
     // accessToken: null,
   };
-  console.log('threadId0-0-0-0-',threadId);
+  // console.log('threadId0-0-0-0-0-0-0-0-',threadId);
   const [inputText, setInputText] = useState('');
   const [isLoadingSend, setIsLoadingSend] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -73,12 +72,12 @@ const ChatScreen = ({route}) => {
           Accept: 'application/json',
           Authorization: `Bearer ${accessToken}`,
         };
-
+         console.log('threadId',threadId)
         const response = await axios.get(
           `https://maryjfinder.com/api/chatbot/messages/${threadId}`,
           {headers},
         );
-
+        console.log('response message ',response?.data?.body)
         if (response.data.status_code === 200) {
           const fetchedMessages = response.data.body.response || [];
           const processedMessages = processMessages(fetchedMessages);
@@ -303,7 +302,7 @@ const ChatScreen = ({route}) => {
     }
   };
   
-  
+
   // const handleLinkPress = (url,messageId) => {
   //   console.log('Link pressed:', url, 'Message ID:', messageId);
   //   // console.log('url-----------------------++++',url);
@@ -320,8 +319,6 @@ const ChatScreen = ({route}) => {
   //     Linking.openURL(url);
   //   }
   // };
-  
-  
   return (
     <View
       style={[styles.container, {backgroundColor: theme.colors.background}]}>
@@ -344,7 +341,6 @@ const ChatScreen = ({route}) => {
           />
         </TouchableOpacity>
       </View>
-  
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={styles.messagesContainer}

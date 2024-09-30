@@ -41,6 +41,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import ProductScreen from './src/screens/ProductScreen';
 import ProductDetails from './src/screens/ProductDetails';
 import AddToCart from './src/screens/AddToCart';
+
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const CustomDrawerContent = ({navigation}) => {
@@ -54,7 +55,9 @@ const CustomDrawerContent = ({navigation}) => {
   const getScreenItemStyle = screenName => {
     return selectedScreen === screenName ? styles.selectedItem : styles.item;
   };
-
+  const getLabelStyle = (screenName) => {
+    return selectedScreen === screenName ? { color: 'green' } : { color: 'black' };
+  };
   return (
     <DrawerContentScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -67,10 +70,11 @@ const CustomDrawerContent = ({navigation}) => {
         label="Dashboard"
         onPress={() => handleScreenPress('Dashboard')}
         style={getScreenItemStyle('Dashboard')}
-        labelStyle={[
-          styles.drawerLabel,
-          selectedScreen === 'Dashboard' && {color: 'green'},
-        ]}
+        // labelStyle={[
+        //   styles.drawerLabel,
+        //   selectedScreen === 'Dashboard' && {color: 'green'},
+        // ]}
+        labelStyle={[styles.drawerLabel, getLabelStyle('Dashboard')]}
         icon={() => <Icon name="dashboard" size={24} color="black" />}
       />
       <DrawerItem
@@ -78,7 +82,13 @@ const CustomDrawerContent = ({navigation}) => {
         onPress={() => handleScreenPress('MyStores')}
         style={getScreenItemStyle('MyStores')}
         icon={() => <Icon name="store" size={24} color="black" />}
-
+        labelStyle={getLabelStyle('MyStores')}
+      />
+ <DrawerItem
+        label="My chat"
+        onPress={() => handleScreenPress('ChatScreen')}
+        style={getScreenItemStyle('MyStores')}
+        icon={() => <Icon name="chat" size={24} color="black" />}
       />
 
       <DrawerItem
@@ -86,14 +96,14 @@ const CustomDrawerContent = ({navigation}) => {
         onPress={() => handleScreenPress('Intractions')}
         style={getScreenItemStyle('Intractions')}
         icon={() => <Icon name="ads-click" size={24} color="black" />}
-
+        labelStyle={getLabelStyle('Intractions')}
       />
       <DrawerItem
         label="Analytics"
         onPress={() => handleScreenPress('Analytics')}
         style={getScreenItemStyle('Analytics')}
         icon={() => <Icon name="analytics" size={24} color="black" />}
-
+        labelStyle={getLabelStyle('Analytics')}
       />
       <DrawerItem
         label="Marketing Tools"
@@ -112,7 +122,7 @@ const CustomDrawerContent = ({navigation}) => {
         onPress={() => handleScreenPress('Reports')}
         style={getScreenItemStyle('Reports')}
         icon={() => <Icon name="edit-document" size={24} color="black" />}
-
+        labelStyle={getLabelStyle('Reports')}
       />
       <DrawerItem
         label="Support"
@@ -140,6 +150,7 @@ const DrawerNavigator = () => {
         drawerType: "slide",
         drawerAnimation: 'slide',   }}>
       <Drawer.Screen name="Dashboard" component={Dashboard} /> 
+      <Drawer.Screen name="ChatScreen" component={ChatDrawer} /> 
       <Drawer.Screen name="MyStores"  component={MyStores} />
       <Drawer.Screen name="Reports"   component={Reports} />
       <Drawer.Screen name="Analytics" component={Analytics} />
@@ -181,18 +192,19 @@ const App = () => {
             {/* <Stack.Screen name="Splash" component={SplashScreen} /> 
             <Stack.Screen name="Selection" component={Selection} />
             <Stack.Screen name="Login" component={Login} /> 
-            <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} /> 
-            <Stack.Screen name="Main" component={SignUpScreen} />  
+            <Stack.Screen name='SignUpScreen' component={SignUpScreen}/> */}
+            {/* <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} />  */}
+            {/* <Stack.Screen name="Main" component={SignUpScreen} />  
             <Stack.Screen name="Verification" component={Verification} /> 
             <Stack.Screen name="About" component={About} /> 
             <Stack.Screen name="AboutBusiness" component={AboutBusiness} />
             <Stack.Screen name="UpgradePlan" component={UpgradePlan} /> 
-            <Stack.Screen name="AddBusiness" component={AddBusiness} /> 
+            <Stack.Screen name="AddBusiness" component={AddBusiness} />  */}
             <Stack.Screen name="Dashboard" component={DrawerNavigator} /> 
             <Stack.Screen name="ActivateStore" component={ActivateStore} /> 
-            <Stack.Screen name="OtpVerify" component={OtpVerify} />  */}
-            <Stack.Screen name="ChatScreen"     component={ChatDrawer} />  
-            <Stack.Screen name="ProductScreen"  component={ProductScreen} /> 
+            <Stack.Screen name="OtpVerify" component={OtpVerify} /> 
+            <Stack.Screen name="ChatScreen"     component={ChatDrawer} />   
+            <Stack.Screen name="ProductScreen"  component={ProductScreen} />  
             <Stack.Screen name='ProductDetails' component={ProductDetails}/>
             <Stack.Screen name='AddToCart' component={AddToCart}/>
           </Stack.Navigator>

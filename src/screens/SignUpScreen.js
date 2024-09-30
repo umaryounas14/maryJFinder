@@ -20,7 +20,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {client_id, client_secret} from '../constants/configs';
 import Icon from 'react-native-vector-icons/AntDesign'; // Import AntDesign icons
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 const {width} = Dimensions.get('window');
 
 const SignUpScreen = ({navigation}) => {
@@ -42,12 +43,16 @@ const SignUpScreen = ({navigation}) => {
   };
 
   const dispatch = useDispatch();
-  const signUpNow = async () => {
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().required('Password is required'),
+  });
+  const handleSubmit  = async (values) => {
     try {
       setLoading(true);
       const payload = {
-        email: email,
-        password: password,
+        email: values.email,
+        password: values.password,
         terms: true,
         grant_type: 'password',
         client_id: client_id,
@@ -56,19 +61,21 @@ const SignUpScreen = ({navigation}) => {
         scope: '',
       };
       const response = await dispatch(signUpUser(payload));
-
+console.log('signUppppp',response)
       if (response?.payload?.body?.message) {
-        navigation.navigate('OtpVerify', {email: email, password: password});
+        navigation.navigate('OtpVerify', 
+          {  email: values.email,  // Pass the email correctly
+          password: values.password });
       }
-       if (response?.payload?.body?.access_token)
-        await AsyncStorage.setItem(
-          'accessToken',
-          response?.payload?.body?.access_token,
-        );
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'About' }],
-        });
+      //  if (response?.payload?.body?.access_token)
+      //   await AsyncStorage.setItem(
+      //     'accessToken',
+      //     response?.payload?.body?.access_token,
+      //   );
+        // navigation.reset({
+        //   index: 0,
+        //   routes: [{ name: 'About' }],
+        // });
 
       setLoading(false);
     } catch (error) {
@@ -100,6 +107,12 @@ const SignUpScreen = ({navigation}) => {
               Create an Account
             </Text>
           </Block>
+          <Formik
+          initialValues={{ email: '', password: '' }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
           <Block flex>
             <Block center>
               <Input
@@ -108,16 +121,16 @@ const SignUpScreen = ({navigation}) => {
                 type="email-address"
                 autoCapitalize="none"
                 bgColor="transparent"
-                onBlur={() => toggleActive('email')}
-                onFocus={() => toggleActive('email')}
-                placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-                onChangeText={text => handleChange('email', text)}
+                onBlur={handleBlur('email')}
+                onChangeText={handleChange('email')}
+                value={values.email}
                 style={[
                   styles.input,
                   active.email ? styles.inputActive : null,
                   {borderRadius: 15, borderColor: '#ddd'},
                 ]}
               />
+               {errors.email && <Text style={{ color: 'red',marginRight:'auto' }}>{errors.email}</Text>}
               <Input
                 password
                 viewPass
@@ -125,16 +138,16 @@ const SignUpScreen = ({navigation}) => {
                 iconColor="black"
                 placeholder="Password"
                 bgColor="transparent"
-                onBlur={() => toggleActive('password')}
-                onFocus={() => toggleActive('password')}
-                placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-                onChangeText={text => handleChange('password', text)}
+                onBlur={handleBlur('password')}
+                onChangeText={handleChange('password')}
+                value={values.password}
                 style={[
                   styles.input,
                   active.password ? styles.inputActive : null,
                   {borderRadius: 15, borderColor: '#ddd'},
                 ]}
               />
+                 {errors.password && <Text style={{ color: 'red',marginRight:'auto' }}>{errors.password}</Text>}
             </Block>
             <Block center flex style={{marginTop: 20}}>
               <Button
@@ -142,7 +155,7 @@ const SignUpScreen = ({navigation}) => {
                 shadowless
                 color="#20B340"
                 style={{height: 48}}
-                onPress={loading ? null : signUpNow} // Disable button while loading
+                onPress={loading ? null : handleSubmit} // Disable button while loading
                 >
                   {loading ? <ActivityIndicator color="white" /> : 'Create Account'}
               </Button>
@@ -201,6 +214,8 @@ const SignUpScreen = ({navigation}) => {
               </View>
             </View>
           </Block>
+           )}
+        </Formik>
       </Block>
     </ScrollView>
   );

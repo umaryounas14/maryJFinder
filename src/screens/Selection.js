@@ -18,23 +18,15 @@ const Selection = ({ navigation }) => {
         />
       </View>
       <View style={styles.buttonContainer}>
-        {/* <Button
-          size="medium"
-          shadowless
-          color="#20B340"
-          style={[styles.button, { width: 200 }]} 
-          onPress={signUpNow}
-        >
-          Create Account
-        </Button> */}
         <Button
           size="medium"
           shadowless
           color="#20B340"
           style={[styles.button, { width: 250 }]} 
-          onPress={() => navigation.navigate('BusinessSignUp')}
+          onPress={()=>navigation.navigate('SignUpScreen')}
+          // onPress={() => navigation.navigate('BusinessSignUp')}
         >
-          Create Business Account
+          Sign Up
         </Button> 
         <Button
           size="medium"

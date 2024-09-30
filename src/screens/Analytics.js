@@ -16,7 +16,7 @@ import LineChartComponent from '../components/LineChart';
 import Heatmap from '../components/Heatmap';
 import TableView from '../components/TableView';
 import PredictiveAnalysisGraph from '../components/PredictiveAnalysisGraph';
-
+import Entypo from 'react-native-vector-icons/Entypo';
 const data = [
   {month: 'Jan', impressions: 10, ctr: 10},
   {month: 'Feb', impressions: 20, ctr: 20},
@@ -64,12 +64,18 @@ const predictiveData = [
 ];
 
 const Analytics = ({navigation}) => {
+  const openDrawer = () => {
+    navigation.openDrawer();
+  };
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.announcementBanner}>
           <Text style={styles.announcementText}>Activate Your Store!</Text>
         </View>
+        <TouchableOpacity onPress={openDrawer}>
+         <Entypo name="menu" size={35} style={{color:'black',marginLeft: 10, marginTop: 10}} />
+        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.iconContainer1,

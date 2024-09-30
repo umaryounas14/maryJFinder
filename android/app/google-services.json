@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:306978665807:android:2e7f7319b8f8a58bdf013a",
         "android_client_info": {
-          "package_name": "com.maryjfinder.business"
+          "package_name": "com.maryjfinder"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "306978665807-unpj3jvq4gmokfkarieu810un5um4idm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.maryjfinder.business",
+            "package_name": "com.maryjfinder",
             "certificate_hash": "5a70b90afb60b07caf9848dc7ad02e4d3474742b"
           }
         },

@@ -17,10 +17,6 @@ const CustomDrawerContent = ({
   fetchMoreConversations,
 }) => {
   const { theme, toggleTheme, isDarkTheme } = useTheme();
-
-  // const navigateToChat = (threadId) => {
-  //   navigation.navigate('ChatScreen', { threadId });
-  // };
   const navigateToChat = (threadId) => {
     if (threadId) {
       navigation.navigate('ChatScreen', { threadId });
@@ -28,7 +24,6 @@ const CustomDrawerContent = ({
       console.error('No threadId provided');
     }
   };
-  
   const handleSignUp = () => {
     navigation.navigate('Main');
   };
@@ -44,9 +39,9 @@ const CustomDrawerContent = ({
       </View>
     );
   }
-
   return (
     <View style={[styles.drawerContent, { backgroundColor: theme.colors.background }]}>
+         <View style={styles.contentContainer}>
       {!isLoggedIn && (
         <TouchableOpacity
           style={styles.newChatContainer}
@@ -97,18 +92,16 @@ const CustomDrawerContent = ({
       </TouchableOpacity>
       {!isLoggedIn && (
         <View style={styles.bottomButtons}>
-          <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+          <TouchableOpacity style={[styles.button, styles.logOutButton]} onPress={handleSignUp}>
+          <Text style={[styles.buttonText, styles.signUpButtonText]}>Sign Up</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button, styles.signUpButton]}
-            onPress={handleLogin}
-          >
+            // style={[styles.button, styles.signUpButton]}
+            onPress={handleLogin}>
             <Text style={[styles.signUpButtonText]}>Login</Text>
           </TouchableOpacity>
         </View>
       )}
-
       {/* Toggle Theme Button */}
       <TouchableOpacity
         style={[styles.colorButton, { backgroundColor: isDarkTheme ? 'black' : '#1f1f1f', borderColor: isDarkTheme ? '#20B340' : '#ffffff' }]}
@@ -118,6 +111,7 @@ const CustomDrawerContent = ({
           {isDarkTheme ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         </Text>
       </TouchableOpacity>
+    </View>
     </View>
   );
 };
@@ -132,7 +126,7 @@ const ChatDrawer = ({ navigation }) => {
     try {
       setIsLoadingConversations(true); // Start loading initial conversations
       const accessToken = await AsyncStorage.getItem('accessToken');
-      console.log('accessToken',accessToken)
+      console.log('accessTokenfatch convocation',accessToken)
       const headers = {
         Accept: 'application/json',
         Authorization: `Bearer ${accessToken}`,
@@ -141,7 +135,7 @@ const ChatDrawer = ({ navigation }) => {
         headers: headers,
         params: { page: currentPageRef.current }
       });
-      console.log('response--------------------=====================chatdrawer=',response?.data?.body?.response)
+      console.log('response--------------------===================5555555==chatdrawer=',response?.data.body?.response?.thread_id)
       if (response.data.status_code === 200) {
         setConversations(response.data.body.response); // Set initial conversations
         currentPageRef.current += 1; // Update currentPage using ref
@@ -170,24 +164,20 @@ const ChatDrawer = ({ navigation }) => {
       console.error('Error logging out:', error);
     }
   }, [navigation]);
-
-  
   const fetchMoreConversations = useCallback(async () => {
     try {
       if (!isLoadingMore && currentPageRef.current <= totalPages) {
         setIsLoadingMore(true); // Start loading more conversations
         const accessToken = await AsyncStorage.getItem('accessToken');
-       
         const headers = {
           Accept: 'application/json',
           Authorization: `Bearer ${accessToken}`,
         };
-
         const response = await axios.get('https://maryjfinder.com/api/chatbot/conversations', {
           headers: headers,
           params: { page: currentPageRef.current }
         });
-console.log('response--------------------fetchMoreConversations]]]]]',response?.data?.thread_id)
+        // console.log('response-=--=-=chatDrawer99999999try',response?.data?.body?.response?.thread_id)
         if (response.data.status_code === 200) {
           setConversations((prevConversations) => [...prevConversations, ...response.data.body.response]);
           currentPageRef.current += 1; // Update currentPage using ref
@@ -211,7 +201,6 @@ console.log('response--------------------fetchMoreConversations]]]]]',response?.
         console.error('Error checking login status:', error);
       }
     };
-
     checkLoggedIn();
   }, []);
 
@@ -241,8 +230,7 @@ console.log('response--------------------fetchMoreConversations]]]]]',response?.
           overlayColor: 'transparent',
           drawerType: "slide",
           drawerAnimation: 'slide', // Explicitly set drawer animation type
-        }}
-      >
+        }} >
         <Drawer.Screen name="ChatScreen" component={ChatScreen} />
       </Drawer.Navigator>
     </ThemeProvider>
@@ -270,6 +258,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 10,
   },
+  contentContainer: {
+    flex: 1,
+    marginTop: 30,
+  },
   button: {
     paddingVertical: 20,
     paddingHorizontal: 20,
@@ -283,7 +275,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 20,
     marginRight: 20,
-    marginTop: 20
+    marginTop: 10
   },
   buttonText: {
     fontSize: 15,
@@ -297,9 +289,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#429e5a',
     borderColor: '#429e5a',
     borderWidth: 1,
-    marginHorizontal: 2,
-    marginVertical: 2,
-    marginBottom: 5
+    marginHorizontal: 20,
+    marginBottom: 10,
+    width:'80%'
+    // backgroundColor: '#429e5a',
+    // borderColor: '#429e5a',
+    // borderWidth: 1,
+    // marginHorizontal: 20,
+    // marginVertical: 2,
+    // marginBottom: 5,
+    // position:'absolute',
+    // bottom:0,
+    // width:'80%',
+    // marginTop:15
   },
   signUpButtonText: {
     color: 'white',

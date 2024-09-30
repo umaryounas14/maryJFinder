@@ -27,6 +27,7 @@ export const otpVerify = createAsyncThunk(
         code: payload.code,
       },
     });
+    console.log('otpslice=================================================',response)
     return response?.data;
   },
 );

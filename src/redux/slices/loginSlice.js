@@ -29,6 +29,7 @@ export const loginUser = createAsyncThunk(
           scope: payload.scope,
         },
       });
+      console.log('SliceLigin',response)
       return response.data;
     } catch (error) {
       if (error.response) {

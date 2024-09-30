@@ -21,6 +21,8 @@ const OtpVerify = ({route, navigation}) => {
   const dispatch = useDispatch();
 
   const verifyNow = async () => {
+    console.log('OG email:', email);
+    console.log('LOG password:', password);
     try {
       setLoading(true);
       const payload = {
@@ -33,20 +35,23 @@ const OtpVerify = ({route, navigation}) => {
         scope: '',
         code: code,
       };
-      console.log(code, code);
+      console.log('code', code);
       const response = await dispatch(otpVerify(payload));
+      console.log('response OTP',response)
       // Check if access_token and account_type are present in the response
       const accessToken = response.payload?.body?.access_token;
-      const accountType = account?.user?.body?.user?.account_type;
+      // const accountType = account?.user?.body?.user?.account_type;
+console.log('accessTokenOTPPPPPP=======================',accessToken);
 
+if(accessToken){
+  navigation.navigate('ChatScreen',{accessToken})
+}
       // If access_token is present and account_type is 'business', navigate to 'AboutBusiness'
-      if (accessToken && accountType === 'business') {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'AboutBusiness' }],
-        });      }
-
-
+      // if (accessToken && accountType === 'business') {
+      //   navigation.reset({
+      //     index: 0,
+      //     routes: [{ name: 'AboutBusiness' }],
+      //   });      }
       setLoading(false);
     } catch (error) {
       console.error('Signup error:', error);

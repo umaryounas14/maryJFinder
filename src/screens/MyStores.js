@@ -19,30 +19,30 @@ import TableView from '../components/TableView';
 import BarChartComponent from '../components/BarChart';
 import DrawerSceneWrapper from '../components/drawerSceneWrapper';
 import { getStores } from '../redux/slices/getStoresSlice';
-
+import Entypo from 'react-native-vector-icons/Entypo';
 const MyStores = ({navigation}) => {
   const dispatch = useDispatch();
-   const stores = useSelector((state) => state.stores.data);
+  //  const stores = useSelector((state) => state.stores.data);
   // const status = useSelector((state) => state.stores.status);
   // const error = useSelector((state) => state.stores.error);
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(getStores());
-    }
-  }, [dispatch, status]);
+  // useEffect(() => {
+  //   if (status === 'idle') {
+  //     dispatch(getStores());
+  //   }
+  // }, [dispatch, status]);
 
   //Transform store data into a format compatible with StoreTableView
-  const formattedStoreData = [
-    ['Name', 'Email', 'Address', 'Type', 'Status', 'Action'],
-    ...stores.map(store => [
-      store.title,
-      'N/A', // Email is not provided in the API response
-      store.address,
-      store.type,
-      store.status_label,
-      store.status === 'draft' ? 'Activate' : 'Edit',
-    ]),
-   ];
+  // const formattedStoreData = [
+  //   ['Name', 'Email', 'Address', 'Type', 'Status', 'Action'],
+  //   ...stores.map(store => [
+  //     store.title,
+  //     'N/A', // Email is not provided in the API response
+  //     store.address,
+  //     store.type,
+  //     store.status_label,
+  //     store.status === 'draft' ? 'Activate' : 'Edit',
+  //   ]),
+  //  ];
 
 
   const performanceData = [
@@ -115,9 +115,9 @@ const MyStores = ({navigation}) => {
         <View style={styles.announcementBanner}>
           <Text style={styles.announcementText}>Activate Your Store!</Text>
         </View>
-        {/* <TouchableOpacity onPress={openDrawer}>
-          <New name="menu" size={30} style={{marginLeft: 10, marginTop: 30}} />
-        </TouchableOpacity> */}
+        <TouchableOpacity onPress={openDrawer}>
+          <Entypo name="menu" size={35} style={{color:'black',marginLeft: 10, marginTop: 10}} />
+        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.iconContainer1,

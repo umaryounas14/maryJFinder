@@ -1,4 +1,4 @@
-package com.maryjfinder.business
+package com.maryjfinder
 
 import android.app.Application
 import com.facebook.react.PackageList

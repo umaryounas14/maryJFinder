@@ -81,7 +81,7 @@ const Dashboard = ({ navigation }) => {
   return (
     <DrawerSceneWrapper>
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <TouchableOpacity onPress={() => navigation.navigate('ActivateStore')} style={styles.announcementBanner}>
           <Text style={styles.announcementText}>Activate Your Store!</Text>
         </TouchableOpacity>

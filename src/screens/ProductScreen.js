@@ -105,8 +105,74 @@ const ProductScreen = ({ route ,navigation}) => {
 //     console.error('Error adding to cart or tracking analytics:', error);
 //   }
 // };
+// const handleAddToCart = async () => {
+//   console.log('32323232323232323233')
+//   try {
+//     const accessToken = await AsyncStorage.getItem('accessToken');
+//     if (!accessToken) {
+//       throw new Error('No access token found');
+//     }
+
+//     // Track the cart click
+//     await fetch('https://maryjfinder.com/api/analytics/track', {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${accessToken}`,
+//         'Accept': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         product_id: productId,
+//         type: 'cart_click',
+//       }),
+//     });
+
+//     // Add to cart API call
+//     await fetch('https://maryjfinder.com/api/cart/add', {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${accessToken}`,
+//         'Accept': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         product_id: productId,
+//       }),
+//     });
+//     // Determine the navigation target based on the linkUrl
+//     let navigationTarget = '';
+//     let params = {};
+//     const analyticsType = linkUrl.includes('/product/') ? 'product_click' : 'cart_click';
+//     if (linkUrl.includes('/product/cart/')) {
+//       {   navigationTarget = 'AddToCart';
+//         params = { productId, messageId,analyticsType };
+//       }
+//       // console.log('ooooooooooooooooooooooooooooooooooooooooocartoooooooooooooooo')
+//       // navigationTarget = 'AddToCart';
+    
+//       // Fetch product data to pass to the next screen
+//       // const response = await fetch(`https://maryjfinder.com/api/product/${productId}`);
+//       const response = await fetch(`https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`)
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch product data');
+//       }
+//       const productData = await response.json();
+//        console.log('productData-=-=-=-=-=44444444-=-=-=-=-=-0000000000000000000000000000000000000000000000000000',response)
+//       params = { productData, messageId };
+//     } else if (linkUrl.includes('/product/')) {
+//       // console.log('0000000000000000000000000000000000product00000000000000000000000000')
+//       navigationTarget = 'ProductDetails';
+//       params = { productId, messageId,analyticsType };
+//     } else {
+//       console.warn('Unhandled URL type:', linkUrl);
+//       return;
+//     }
+//     // Navigate to the appropriate screen with the params
+//     navigation.navigate(navigationTarget, params);
+
+//   } catch (error) {
+//     console.error('Error adding to cart or tracking analytics:', error);
+//   }
+// };
 const handleAddToCart = async () => {
-  console.log('32323232323232323233')
   try {
     const accessToken = await AsyncStorage.getItem('accessToken');
     if (!accessToken) {
@@ -137,36 +203,32 @@ const handleAddToCart = async () => {
         product_id: productId,
       }),
     });
-    // Determine the navigation target based on the linkUrl
-    let navigationTarget = '';
-    let params = {};
+
+    // Fetch the updated cart (if needed) or simply pass the product details to the next screen
     const analyticsType = linkUrl.includes('/product/') ? 'product_click' : 'cart_click';
-    if (linkUrl.includes('/product/cart/')) {
-      {   navigationTarget = 'AddToCart';
-        params = { productId, messageId,analyticsType };
+    const response = await fetch(
+      `https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json',
+        },
       }
-      // console.log('ooooooooooooooooooooooooooooooooooooooooocartoooooooooooooooo')
-      // navigationTarget = 'AddToCart';
-    
-      // Fetch product data to pass to the next screen
-      // const response = await fetch(`https://maryjfinder.com/api/product/${productId}`);
-      const response = await fetch(`https://maryjfinder.com/api/product/${productId}?track_analytics=1&analytics_type=${analyticsType}&message_id=${messageId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch product data');
-      }
-      const productData = await response.json();
-       console.log('productData-=-=-=-=-=44444444-=-=-=-=-=-0000000000000000000000000000000000000000000000000000',response)
-      params = { productData, messageId };
-    } else if (linkUrl.includes('/product/')) {
-      // console.log('0000000000000000000000000000000000product00000000000000000000000000')
-      navigationTarget = 'ProductDetails';
-      params = { productId, messageId,analyticsType };
-    } else {
-      console.warn('Unhandled URL type:', linkUrl);
-      return;
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch product data');
     }
-    // Navigate to the appropriate screen with the params
-    navigation.navigate(navigationTarget, params);
+
+    const productData = await response.json();
+
+    // Navigate to the ProductDetails screen and pass the necessary data
+    navigation.navigate('ProductDetails', {
+      productId,
+      messageId,
+      productData,  // Pass the fetched product data
+      selectedProducts: [productData] // Pass a list of selected products, here with just one for now
+    });
 
   } catch (error) {
     console.error('Error adding to cart or tracking analytics:', error);

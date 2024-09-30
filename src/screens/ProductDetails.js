@@ -105,7 +105,7 @@ const ProductDetails = ({ route, navigation }) => {
 
         {/* Add to Cart Button */}
         <TouchableOpacity style={styles.btnView}>
-          <Text style={styles.btnText}>Continue Order</Text>
+          <Text style={styles.btnText}>Confirm Order</Text>
         </TouchableOpacity>
         {/* <Button title="Continue Order" onPress={handleAddToCart} /> */}
       </View>

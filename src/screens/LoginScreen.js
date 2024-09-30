@@ -25,6 +25,8 @@ import {client_id, client_secret, web_client_id} from '../constants/configs';
 import {loginUser} from '../redux/slices/loginSlice';
 import {socialLoginGoogle} from '../redux/slices/googleLoginSlice';
 import {BASE_URL} from '../constants/endpoints';
+import { Formik } from 'formik';
+import * as Yup from 'yup';  // For validation
 const {width} = Dimensions.get('window');
 
 const Login = ({navigation}) => {
@@ -36,7 +38,10 @@ const Login = ({navigation}) => {
     email: false,
     password: false,
   });
-
+  const validationSchema = Yup.object({
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
+  });
   const storeTokensAndUserData = async (
     accessToken,
     refreshToken,
@@ -167,14 +172,14 @@ const Login = ({navigation}) => {
     setActive({...active, [name]: !active[name]});
   };
 
-  const loginNow = async () => {
+  const loginNow = async (values) => {
     setLoading(true);
     const payload = {
       grant_type: 'password',
       client_id: client_id,
       client_secret: client_secret,
-      username: email,
-      password: password,
+      username: values.email,
+      password: values.password,
       scope: '',
     };
 
@@ -377,18 +382,30 @@ const Login = ({navigation}) => {
             Welcome Back
           </Text>
         </Block>
+        <Formik
+  initialValues={{ email: '', password: '' }}
+  validationSchema={validationSchema}
+  onSubmit={async (values) => {
+    // Call loginNow with the entire form values object
+    await loginNow(values);
+  }}
+>
+  {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+
         <Block flex>
+      
           <Block center>
             <Input
-              color="black"
-              placeholder="Email Address"
-              type="email-address"
-              autoCapitalize="none"
-              bgColor="transparent"
-              onBlur={() => toggleActive('email')}
-              onFocus={() => toggleActive('email')}
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={text => handleChange('email', text)}
+               color="black"
+               placeholder="Email Address"
+               type="email-address"
+               autoCapitalize="none"
+               bgColor="transparent"
+               onBlur={handleBlur('email')} // Ensure handleBlur is passed correctly
+               onFocus={() => toggleActive('email')}
+               placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+               onChangeText={handleChange('email')} // Ensure handleChange is passed correctly
+               value={values.email} // Bind value to the formik value
               style={[
                 styles.input,
                 active.email ? styles.inputActive : null,
@@ -398,17 +415,21 @@ const Login = ({navigation}) => {
                 },
               ]}
             />
+            {touched.email && errors.email && (
+            <Text style={{ color: 'red', marginRight: 'auto' }}>{errors.email}</Text>
+          )}
             <Input
-              password
-              viewPass
-              color="black"
-              iconColor="black"
-              placeholder="Password"
-              bgColor="transparent"
-              onBlur={() => toggleActive('password')}
-              onFocus={() => toggleActive('password')}
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={text => handleChange('password', text)}
+             password
+             viewPass
+             color="black"
+             iconColor="black"
+             placeholder="Password"
+             bgColor="transparent"
+             onBlur={handleBlur('password')} // Ensure handleBlur is passed correctly
+             onFocus={() => toggleActive('password')}
+             placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+             onChangeText={handleChange('password')} // Ensure handleChange is passed correctly
+             value={values.password} // Bind value to the formik value
               style={[
                 styles.input,
                 active.password ? styles.inputActive : null,
@@ -419,21 +440,25 @@ const Login = ({navigation}) => {
                 },
               ]}
             />
+              {touched.password && errors.password && (
+            <Text style={{ color: 'red', marginRight: 'auto' }}>{errors.password}</Text>
+          )}
           </Block>
+         
           <Block center flex style={{marginTop: 20}}>
             <Button
               size="medium"
               shadowless
               color="#20B340"
               style={{height: 48}}
-              onPress={loading ? null : loginNow}>
-              {loading ? <ActivityIndicator color="white" /> : 'Login'}
+              onPress={loading ? null : handleSubmit} >
+                   {loading ? <ActivityIndicator color="white" /> : 'Login'}
             </Button>
             <Button
               size="large"
               color="transparent"
               shadowless
-              onPress={() => navigation.navigate('BusinessSignUp')}>
+              onPress={() => navigation.navigate('SignUpScreen')}>
               <Text
                 center
                 color={theme.COLORS.WHITE}
@@ -446,6 +471,7 @@ const Login = ({navigation}) => {
               </Text>
             </Button>
           </Block>
+          
           <View style={styles.container}>
             <View style={styles.line} />
             <Text style={styles.orText}>OR</Text>
@@ -493,7 +519,10 @@ const Login = ({navigation}) => {
             </View>
           </View>
         </Block>
+     )}
+</Formik>
       </Block>
+
     </ScrollView>
   );
 };

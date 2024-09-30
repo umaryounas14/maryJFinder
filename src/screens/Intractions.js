@@ -16,14 +16,20 @@ import Heatmap from '../components/Heatmap';
 import TableView from '../components/TableView';
 import PredictiveAnalysisGraph from '../components/PredictiveAnalysisGraph';
 import MultiLineChart from '../components/MultiLineChart';
-
+import Entypo from 'react-native-vector-icons/Entypo';
 const Intractions = ({navigation}) => {
+  const openDrawer = () => {
+    navigation.openDrawer();
+  };
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.announcementBanner}>
           <Text style={styles.announcementText}>Activate Your Store!</Text>
         </View>
+        <TouchableOpacity onPress={openDrawer}>
+         <Entypo name="menu" size={35} style={{color:'black',marginLeft: 10, marginTop: 10}} />
+        </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.iconContainer1,
@@ -54,7 +60,7 @@ const Intractions = ({navigation}) => {
           ]}>
           <Icon name="user" size={24} color="white" />
         </TouchableOpacity>
-
+      
         <Block flex middle>
           <KeyboardAvoidingView behavior="padding" enabled>
             <View
