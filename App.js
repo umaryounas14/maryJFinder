@@ -189,17 +189,17 @@ const App = () => {
           <Stack.Navigator
             initialRouteName="Splash"
             screenOptions={screenOptions}>
-            {/* <Stack.Screen name="Splash" component={SplashScreen} /> 
+            <Stack.Screen name="Splash" component={SplashScreen} /> 
             <Stack.Screen name="Selection" component={Selection} />
             <Stack.Screen name="Login" component={Login} /> 
-            <Stack.Screen name='SignUpScreen' component={SignUpScreen}/> */}
+            <Stack.Screen name='SignUpScreen' component={SignUpScreen}/>
             {/* <Stack.Screen name="BusinessSignUp" component={BusinessSignUp} />  */}
-            {/* <Stack.Screen name="Main" component={SignUpScreen} />  
+            <Stack.Screen name="Main" component={SignUpScreen} />  
             <Stack.Screen name="Verification" component={Verification} /> 
             <Stack.Screen name="About" component={About} /> 
             <Stack.Screen name="AboutBusiness" component={AboutBusiness} />
             <Stack.Screen name="UpgradePlan" component={UpgradePlan} /> 
-            <Stack.Screen name="AddBusiness" component={AddBusiness} />  */}
+            <Stack.Screen name="AddBusiness" component={AddBusiness} /> 
             <Stack.Screen name="Dashboard" component={DrawerNavigator} /> 
             <Stack.Screen name="ActivateStore" component={ActivateStore} /> 
             <Stack.Screen name="OtpVerify" component={OtpVerify} /> 

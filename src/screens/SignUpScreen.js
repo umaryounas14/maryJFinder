@@ -61,7 +61,7 @@ const SignUpScreen = ({navigation}) => {
         scope: '',
       };
       const response = await dispatch(signUpUser(payload));
-console.log('signUppppp',response)
+      console.log('signUppppp',response?.payload?.body)
       if (response?.payload?.body?.message) {
         navigation.navigate('OtpVerify', 
           {  email: values.email,  // Pass the email correctly

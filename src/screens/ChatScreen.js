@@ -580,6 +580,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flexWrap: 'wrap',
     maxWidth: '100%',
+  
   },
   messageIcon: {
     position: 'absolute',
